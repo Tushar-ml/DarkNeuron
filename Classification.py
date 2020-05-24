@@ -68,35 +68,8 @@ class CNN(Deep_Stack):
         self.train = train
         self.target_image_size = target_image_size
         
-    """
-    Defining Preprocess Function to Preprocess the Images with Different Flow Method
-    
-    """
-    def Image_Preprocessing(self,model_name,num_classes,batch_size,method):
-        """
-        This function Will do image processing and return training Data Generator, Validation Data Generator
-        
-        and Test Data Generator on the Basis of Training Argument whether it is True Or False.
-        
-        Arguments:
-            model_name --> Name for The Predefined Architecture
-            num_classes --> Number of Classes
-            batch_size --> Batch Size
-            method --> Method by which Images will flow in the Function
+
             
-        Outputs:
-            It will Return the Data Generator for Train and Test
-        
-        """
-        self.model_name = model_name
-        self.num_classes = num_classes
-        self.batch_size = batch_size
-        self.method = method
-        
-        #Defining Variables for Preprocessing
-        preprocessing = Preprocess_Image(self.model_name,self.num_classes,self.batch_size,self.target_image_size,self.train)
-        
-        if self.method == 'directory':
             
     
     
