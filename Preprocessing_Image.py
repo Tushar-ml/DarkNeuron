@@ -10,7 +10,7 @@ Author: Tushar Goel
 """
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
+import numpy as np
 
 class Preprocess_Image:
     """
@@ -87,7 +87,7 @@ class Preprocess_Image:
             preprocess_function = tf.keras.applications.vgg19.preprocess_input
             return preprocess_function
         
-    def Get_Images_from_Directory(self,training_images_directory,validation_images_directory=None):
+    def Get_Images_from_Directory(self,training_images_directory=None,validation_images_directory=None,test_image_directory=None):
         
         """
         This Function will Take images from image Directory and convert them to desired
@@ -119,23 +119,29 @@ class Preprocess_Image:
         
         # Data Generator Function for preprocessing Function
         data_generator = ImageDataGenerator(preprocessing_function = preprocessing_function,
-                                                reshape = 1./255)
+                                                rescale=1./255,
+                                                shear_range=0.2,
+                                                zoom_range=0.2,
+                                                horizontal_flip=True)
         
         if self.training:
-            
+            if training_images_directory is None:
+                raise ValueError('For Training Image Directory is Must')
             # Train Data Generator for 
             train_data_generator = data_generator.flow_from_directory(directory = training_images_directory,
                                                                       target_size = (target_image_size[0],target_image_size[1]),
                                                                       batch_size = self.batch_size,
                                                                       class_mode = self.class_mode)
             #Checking Validation Data Directory , If exists return train and validation data generator
-            if not validation_images_directory:
+            if validation_images_directory is not None:
                 validation_data_generator = data_generator.flow_from_directory(directory = validation_images_directory,
                                                                                target_size = (target_image_size[0],target_image_size[1]))
                 return train_data_generator,validation_data_generator
             
             return train_data_generator,None
         else:
+            if test_image_directory is None:
+                raise ValueError('Test Image Directory Required for Prediction')
             # Data Generator Function for preprocessing Function
             data_generator = ImageDataGenerator(preprocessing_function = preprocessing_function,
                                                 reshape = 1./255)
@@ -144,7 +150,7 @@ class Preprocess_Image:
                                                                      )
             return test_data_generator
             
-    def Get_Images_from_Dataframe(self,dataframe,x_column_name,split=0.2,y_column_name=None,image_directory=None):
+    def Get_Images_from_DataFrame(self,dataframe,x_column_name,split=0.1,y_column_name=None,image_directory=None):
         """
         This Function will take Filename from Dataframe and Preprocess it from that loacation 
         
@@ -176,32 +182,42 @@ class Preprocess_Image:
             
             #Splitting dataframe for Validation and Training Data 
             training_length = round((1-split)*dataframe_length)
-            training_dataframe = dataframe[:training_length+1]
-            validation_dataframe = dataframe[training_length+1:]
+            training_dataframe = dataframe[:training_length]
+            validation_dataframe = dataframe[training_length:]
+            validation_dataframe.columns = dataframe.columns.values
             
+            if y_column_name is None:
+                raise ValueError(' For Training Y Columns is required')
             # Train Data Generator for 
             train_data_generator = data_generator.flow_from_dataframe(dataframe=training_dataframe,
                                                                       directory = image_directory,
                                                                       x_col = x_column_name,
                                                                       y_col = y_column_name,
-                                                                      target_size = (self.target_size[0],self.target_size[1]),
+                                                                      target_size = (self.target_image_size[0],self.target_image_size[1]),
                                                                       class_mode = self.class_mode,
+                                                                      
                                                                       batch_size = self.batch_size)
-            validation_data_generator = data_generator.flow_from_dataframe(dataframe=validation_dataframe,
-                                                                      directory = image_directory,
-                                                                      x_col = x_column_name,
-                                                                      y_col = y_column_name,
-                                                                      target_size = (self.target_size[0],self.target_size[1]),
-                                                                      class_mode = self.class_mode,
-                                                                      batch_size = self.batch_size)
-            return train_data_generator,validation_data_generator
+            try:
+                validation_data_generator = data_generator.flow_from_dataframe(dataframe=validation_dataframe,
+                                                                          directory = image_directory,
+                                                                          x_col = x_column_name,
+                                                                          y_col = y_column_name,
+                                                                          target_size = (self.target_image_size[0],self.target_image_size[1]),
+                                                                          class_mode = self.class_mode,
+                                                                
+                                                                          batch_size = self.batch_size)
+                print('-----Validation and Train Data Generated----------')
+                return train_data_generator,validation_data_generator
+            except:
+                return train_data_generator,None
         
         else:
             # Test Data Generator 
             test_data_generator = data_generator.flow_from_dataframe(dataframe=dataframe,
                                                                       directory = image_directory,
                                                                       x_col = x_column_name,
-                                                                      target_size = (self.target_size[0],self.target_size[1]),
+                                                                      y_col = y_column_name,
+                                                                      target_size = (self.target_image_size[0],self.target_image_size[1]),
                                                                      )
             return test_data_generator
         
@@ -222,25 +238,25 @@ class Preprocess_Image:
         
         # Data Generator Function for preprocessing Function
         data_generator = ImageDataGenerator(preprocessing_function = preprocessing_function)
-        
+        x_train = np.expand_dims(x_train,axis=-1)
+        x_test = np.expand_dims(x_test,axis=-1)
         if self.training:
              # Train Data Generator for x_train,y_train
+            if y_train is None:
+                raise ValueError('For Training, Classes are required')
             train_data_generator = data_generator.flow(x = x_train,
                                                        y = y_train,
-                                                       target_size = (self.target_size[0],self.target_size[1]),
-                                                       class_mode = self.class_mode,
-                                                       batch_size = self.batch_size)
+                                                
+                                                        batch_size = self.batch_size)
             validation_data_generator = data_generator.flow(x = x_test,
                                                        y = y_test,
-                                                       target_size = (self.target_size[0],self.target_size[1]),
-                                                       class_mode = self.class_mode,
+                                                    
                                                        batch_size = self.batch_size)
             return train_data_generator,validation_data_generator
         
         else:
             test_data_generator = data_generator.flow(x = x_test,
-                                                       y = None,
-                                                       target_size = (self.target_size[0],self.target_size[1]),
+                                                       y = y_test
                                                        )
             
             return test_data_generator
