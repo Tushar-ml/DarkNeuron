@@ -260,12 +260,3 @@ def Model_Target_Value_Checker():
              'VGG19 --> (32,32) \n'
              )
 
-import pandas as pd
-df = pd.read_csv('C:/Users/Tushar Goel/Desktop/animals.csv')
-directory = 'C:/Users/Tushar Goel/Desktop'
-image_directory = 'C:/Users/Tushar Goel/Desktop/Animals'
-cnn = CNN(directory,directory,(224,224,3),True)
-train,val = cnn.Preprocess_the_Image('InceptionV3',2,'directory',64,training_image_directory = r'C:\Users\Tushar Goel\Desktop\cat-and-dog\training_set\training_set',validation_image_directory = r'C:\Users\Tushar Goel\Desktop\cat-and-dog\test_set\test_set')
-model = cnn.Create_the_Model()
-#print(model.summary())
-history,model = cnn.Train_the_Model(model=model,train_data_object = train,validation_data_object = val,fine_tuning =False ,layers='all',epochs=5)
