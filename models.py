@@ -271,7 +271,8 @@ def Train_Model(model,num_classes,train_data_object,model_name,working_directory
         
         history = New_Model.fit_generator(train_data_object,epochs=epochs,validation_data = validation_data_object,
                             callbacks = my_callbacks)
-   
+        
+
     return history,New_Model
 
  
