@@ -22,7 +22,6 @@ class Create_Model:
         
     Methods:
         Different Architecture Model:
-            MobileNetV2
             InceptionV3
             Xception
             VGG16
@@ -208,7 +207,7 @@ class Create_Model:
 
 
 def Train_Model(model,num_classes,train_data_object,model_name,working_directory,output_directory,optimizer,loss,epochs,metrics,validation_data_object=None,fine_tuning=False,
-                layers = 20 , save_model = True):
+                layers = 20 , save_model = True,steps_per_epoch = 50):
     """
     This Function will be used to train the Model and save the model to Output Directory
     
@@ -223,7 +222,11 @@ def Train_Model(model,num_classes,train_data_object,model_name,working_directory
         Trained Model
     """
     if num_classes == 2:
-        num_classes = num_classes - 1
+        target = num_classes - 1
+        activation = 'sigmoid'
+    else:
+        target = num_classes
+    activation = 'softmax'
     model.trainable = False    
     if fine_tuning:
         #Fine tuning for Increasing the accuracy of the model
@@ -251,7 +254,7 @@ def Train_Model(model,num_classes,train_data_object,model_name,working_directory
         os.mkdir(model_checkpoint_directory)
     
     layer1 = tf.keras.layers.GlobalAveragePooling2D()(model.output)
-    output = tf.keras.layers.Dense(num_classes,activation='softmax')(layer1)
+    output = tf.keras.layers.Dense(target,activation=activation)(layer1)
     
     New_Model = tf.keras.models.Model(inputs = model.input , outputs = output)
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
@@ -265,11 +268,11 @@ def Train_Model(model,num_classes,train_data_object,model_name,working_directory
     New_Model.compile(loss = loss,optimizer = optimizer,metrics = [metrics])
     if validation_data_object is None:
         
-        history = New_Model.fit_generator(train_data_object,epochs= epochs, callbacks = my_callbacks)
+        history = New_Model.fit_generator(train_data_object,steps_per_epoch = 50,epochs= epochs, callbacks = my_callbacks)
         
     else:
         
-        history = New_Model.fit_generator(train_data_object,epochs=epochs,validation_data = validation_data_object,
+        history = New_Model.fit_generator(train_data_object,steps_per_epoch = 3,epochs=epochs,validation_data = validation_data_object,
                             callbacks = my_callbacks)
         
 

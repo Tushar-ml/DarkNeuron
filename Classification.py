@@ -11,7 +11,6 @@ Different Architectures:
     --> VGG16
     --> VGG19
     --> Resnet50
-    --> MobileNetV2
 
 """
 from Deep_Stack import Deep_Stack
@@ -64,20 +63,15 @@ class CNN(Deep_Stack):
         self.optimizer = 'adam'
         self.train = train
         self.target_image_size = target_image_size
-<<<<<<< HEAD
-        
-<<<<<<< HEAD
 
-            
-=======
         print('\t\t--------------------------------------')
         print('\t\t| Step:1 Call Preprocess_the_Image() |')
         print('\t\t--------------------------------------')
-=======
+
         self.working_directory = working_directory
         self.output_directory = output_directory
 
->>>>>>> model_class_creation
+
     """
     Defining Preprocess Function to Preprocess the Images with Different Flow Method
     
@@ -163,10 +157,10 @@ class CNN(Deep_Stack):
             
             raise ValueError('Invalid Method Input --Must be from "directory","dataframe","point"')
             
-<<<<<<< HEAD
 
 
-=======
+
+
     def Create_the_Model(self):
             
         """
@@ -174,7 +168,7 @@ class CNN(Deep_Stack):
         
         Arguments:
             None
->>>>>>> model_class_creation
+
             
         Returns:
             It will return the model for Training the model
@@ -238,7 +232,7 @@ class CNN(Deep_Stack):
             
             
         
-    def Train_the_Model(self,model,train_data_object=None,validation_data_object=None,test_data_object=None,epochs = 10,optimizer='adam',loss = 'binary_crossentropy',fine_tuning = False,layers = 20,metrics='accuracy',save_model = True):
+    def Train_the_Model(self,model,train_data_object=None,validation_data_object=None,test_data_object=None,epochs = 10,optimizer='adam',loss = 'binary_crossentropy',fine_tuning = False,layers = 20,metrics='accuracy',save_model = True,steps_per_epoch = 50):
         """
         This function will call up the Initialised Model 
         
@@ -248,7 +242,7 @@ class CNN(Deep_Stack):
         history,model = Train_Model(model=model,num_classes = self.num_classes,train_data_object=train_data_object,model_name = self.model_name,
                                     working_directory = self.working_directory,output_directory = self.output_directory,loss = loss,epochs=epochs,
                                     optimizer = optimizer,metrics = metrics,validation_data_object = validation_data_object,fine_tuning = fine_tuning,
-                                    layers = layers,save_model=save_model)
+                                    layers = layers,save_model=save_model,steps_per_epoch = steps_per_epoch)
         self.model_history = history
         return history,model
         
@@ -271,7 +265,7 @@ df = pd.read_csv('C:/Users/Tushar Goel/Desktop/animals.csv')
 directory = 'C:/Users/Tushar Goel/Desktop'
 image_directory = 'C:/Users/Tushar Goel/Desktop/Animals'
 cnn = CNN(directory,directory,(224,224,3),True)
-train,val = cnn.Preprocess_the_Image('Xception',2,'dataframe',32,dataframe=df,x_col='Filename',y_col='classes',image_directory=image_directory)
+train,val = cnn.Preprocess_the_Image('InceptionV3',2,'directory',64,training_image_directory = r'C:\Users\Tushar Goel\Desktop\cat-and-dog\training_set\training_set',validation_image_directory = r'C:\Users\Tushar Goel\Desktop\cat-and-dog\test_set\test_set')
 model = cnn.Create_the_Model()
 #print(model.summary())
 history,model = cnn.Train_the_Model(model=model,train_data_object = train,validation_data_object = val,fine_tuning =False ,layers='all',epochs=5)

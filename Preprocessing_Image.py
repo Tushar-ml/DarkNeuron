@@ -11,7 +11,7 @@ Author: Tushar Goel
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np
-
+from keras.utils.np_utils import to_categorical
 class Preprocess_Image:
     """
     This Class will be Preprocessing Feature based on differnt Different Models and Differnt Methods for custom image 
@@ -135,16 +135,18 @@ class Preprocess_Image:
             #Checking Validation Data Directory , If exists return train and validation data generator
             if validation_images_directory is not None:
                 validation_data_generator = data_generator.flow_from_directory(directory = validation_images_directory,
-                                                                               target_size = (target_image_size[0],target_image_size[1]))
+                                                                               target_size = (target_image_size[0],target_image_size[1]),
+                                                                               class_mode = self.class_mode)
                 return train_data_generator,validation_data_generator
             
-            return train_data_generator,None
+            else:
+                return train_data_generator,None
         else:
             if test_image_directory is None:
                 raise ValueError('Test Image Directory Required for Prediction')
             # Data Generator Function for preprocessing Function
-            data_generator = ImageDataGenerator(preprocessing_function = preprocessing_function,
-                                                reshape = 1./255)
+            data_generator = ImageDataGenerator(
+                                                rescale = 1./255)
             test_data_generator = data_generator.flow_from_directory(directory = training_images_directory,
                                                                      target_size = (target_image_size[0],target_image_size[1])
                                                                      )
@@ -174,7 +176,8 @@ class Preprocess_Image:
         preprocessing_function = self.preprocess_architecture_function()
         
         # Data Generator Function for preprocessing Function
-        data_generator = ImageDataGenerator(preprocessing_function = preprocessing_function)
+        data_generator = ImageDataGenerator(preprocessing_function = preprocessing_function,
+                                            reshape = 1./255)
         
         #Splitting Functions for training and Predictions :
         if self.training:
@@ -237,9 +240,13 @@ class Preprocess_Image:
         preprocessing_function = self.preprocess_architecture_function()
         
         # Data Generator Function for preprocessing Function
-        data_generator = ImageDataGenerator(preprocessing_function = preprocessing_function)
+        data_generator = ImageDataGenerator(preprocessing_function,
+                                            rescale = 1./255)
         x_train = np.expand_dims(x_train,axis=-1)
         x_test = np.expand_dims(x_test,axis=-1)
+        
+        y_train = to_categorical(y_train)
+        y_test = to_categorical(y_test)
         if self.training:
              # Train Data Generator for x_train,y_train
             if y_train is None:
