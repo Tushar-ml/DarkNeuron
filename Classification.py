@@ -18,7 +18,7 @@ from Deep_Stack import Deep_Stack
 import  tensorflow as tf            # Powerful Framework for Deep Learning
 import keras                        # A Deep Learning API 
 import os                           # For Searching Folder within the system
-from models import Models           # Script containing Different Models
+from models import Create_Model, Train_Model           # Script containing Different Models
 from Preprocessing_Image import Preprocess_Image      #Preprocessing Image Script
  
 class CNN(Deep_Stack):
@@ -34,7 +34,6 @@ class CNN(Deep_Stack):
         --Create_the_Model
         --Train_the_Model
         --Predict_from_the_Model
-        --Generate_the_Model
         --Visualize_the_Model
         --Deploy_the_Model
     """
@@ -61,11 +60,12 @@ class CNN(Deep_Stack):
         """
         Deep_Stack.__init__(self,working_directory,output_directory)
         self.epochs = 10                    #Initializing Epochs
-        self.loss = 'sparse_categorical_crossentropy' 
+        self.loss = 'binary_crossentropy' 
         self.optimizer = 'adam'
         self.train = train
         self.target_image_size = target_image_size
-        
+        self.working_directory = working_directory
+        self.output_directory = output_directory
 
     """
     Defining Preprocess Function to Preprocess the Images with Different Flow Method
@@ -166,7 +166,7 @@ class CNN(Deep_Stack):
         """
         print('\n\t\t--------------Model Creation Phase-----------\n')
         
-        model_init = Models(self.working_directory,self.target_image_size,self.train)
+        model_init = Create_Model(self.working_directory,self.target_image_size,self.train)
         
         # Defining Model based on Model name:
         if self.model_name in ['mobilenetv2','MobileNetV2','mobilenet_v2','MobileNet_V2']:
@@ -222,9 +222,19 @@ class CNN(Deep_Stack):
             
             
         
+    def Train_the_Model(self,model,train_data_object=None,validation_data_object=None,test_data_object=None,epochs = 10,optimizer='adam',loss = 'binary_crossentropy',fine_tuning = False,layers = 20,metrics='accuracy',save_model = True):
+        """
+        This function will call up the Initialised Model 
         
+        """
         
-    
+        print('\n\t\t------------Model Training To be Start---------------')
+        history,model = Train_Model(model=model,num_classes = self.num_classes,train_data_object=train_data_object,model_name = self.model_name,
+                                    working_directory = self.working_directory,output_directory = self.output_directory,loss = loss,epochs=epochs,
+                                    optimizer = optimizer,metrics = metrics,validation_data_object = validation_data_object,fine_tuning = fine_tuning,
+                                    layers = layers,save_model=save_model)
+        self.model_history = history
+        
         
 def Model_Target_Value_Checker():
         raise ValueError('Try with Different Model.Get '
@@ -239,3 +249,10 @@ def Model_Target_Value_Checker():
              'VGG19 --> (32,32) \n'
              )
 
+
+directory = 'C:/Users/Tushar Goel/Desktop'
+image_directory = 'C:/Users/Tushar Goel/Desktop/Animals'
+cnn = CNN(directory,directory,(128,128,3),True)
+train,val = cnn.Preprocess_the_Image('MobileNetV2',2,'directory',32,training_image_directory = r'C:\Users\Tushar Goel\Desktop\cat-and-dog\training_set\training_set',validation_image_directory = r'C:\Users\Tushar Goel\Desktop\cat-and-dog\test_set\test_set')
+model = cnn.Create_the_Model()
+cnn.Train_the_Model(model=model,train_data_object = train,validation_data_object = val,epochs = 15,fine_tuning =False ,layers='all')
