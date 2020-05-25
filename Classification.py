@@ -15,7 +15,6 @@ Different Architectures:
 
 """
 from Deep_Stack import Deep_Stack
-import cv2                          # Computer Vision Library
 import  tensorflow as tf            # Powerful Framework for Deep Learning
 import keras                        # A Deep Learning API 
 import os                           # For Searching Folder within the system
@@ -34,7 +33,7 @@ class CNN(Deep_Stack):
         --Preprocess_the_Images
         --Create_the_Model
         --Train_the_Model
-        --Predict_the_Model
+        --Predict_from_the_Model
         --Generate_the_Model
         --Visualize_the_Model
         --Deploy_the_Model
@@ -67,14 +66,12 @@ class CNN(Deep_Stack):
         self.train = train
         self.target_image_size = target_image_size
         
-        print('\t\t--------------------------------------')
-        print('\t\t| Step:1 Call Preprocess_the_Image() |')
-        print('\t\t--------------------------------------')
+
     """
     Defining Preprocess Function to Preprocess the Images with Different Flow Method
     
     """
-    def Preprocess_the_Image(self,model_name,num_classes,batch_size,method,training_image_directory=None,validation_image_directory=None,dataframe=None,
+    def Preprocess_the_Image(self,model_name,num_classes,method,batch_size=32,training_image_directory=None,validation_image_directory=None,dataframe=None,
                             test_image_directory=None,x_train=None,x_test=None,y_train=None,y_test=None,x_col=None,y_col = None,split=0.1,image_directory=None):
         """
         This function Will do image processing and return training Data Generator, Validation Data Generator
@@ -130,7 +127,7 @@ class CNN(Deep_Stack):
             print('\n\t\t-----Getting Images From DataFrame------\n')
             if self.train:
                 train_data,validation_data = preprocessing.Get_Images_from_DataFrame(self.dataframe,self.x_col_name,self.split,self.y_col_name,self.image_directory)
-                print('\n-----Training Data Generated------\n')
+                print('\n\t\t-----Training Data Generated------\n')
                 
                 return train_data,validation_data
             
@@ -155,15 +152,71 @@ class CNN(Deep_Stack):
             
             raise ValueError('Invalid Method Input --Must be from "directory","dataframe","point"')
             
-
-(x_train,y_train),(x_test,y_test) = tf.keras.datasets.mnist.load_data()
-target_size = (28,28,1)            
-cnn = CNN('C:/Users/Tushar Goel/Desktop','C:/Users/Tushar Goel/Desktop',target_size,False)
-cnn.Preprocess_the_Image(model_name='mobilenetv2',num_classes = 10,batch_size = 32,method='point',x_train = x_train,y_train = y_train,x_test = x_test,y_test=y_test)
+    def Create_the_Model(self):
             
+        """
+        This Function will be used for Initialisation of Model according to Model name Given
+        
+        Arguments:
+            None
             
+        Returns:
+            It will return the model for Training the model
+            
+        """
+        print('\n\t\t--------------Model Creation Phase-----------\n')
+        
+        model_init = Models(self.working_directory,self.target_image_size,self.train)
+        
+        # Defining Model based on Model name:
+        if self.model_name in ['mobilenetv2','MobileNetV2','mobilenet_v2','MobileNet_V2']:
+            
+            # Checking whether Target Image size is within bounds for Predefined Architecture
+            if self.target_image_size[0] <32 or self.target_image_size[1]<32:
+                    Model_Target_Value_Checker()  #Check the Function Below which Raise the Value Error
+                                 
+            print('\n\t\t-------MobileNetV2 Model Initiated Successfully----------\n')
+            return model_init.MobileNetV2()
+            
+        if self.model_name in ['inceptionv3','InceptionV3','inception_v3','Inception_V3']:
+            
+            # Checking whether Target Image size is within bounds for Predefined Architecture
+            if self.target_image_size[0] <75 or self.target_image_size[1]<75:
+                    Model_Target_Value_Checker()  #Check the Function Below which Raise the Value Error
+            print('\n\t\t-------InceptiontV3 Model Initiated Successfully----------\n')                     
+            return model_init.InceptionV3()
+            
+        if self.model_name in ['resnet50','ResNet50','Resnet50']:
+            
+            # Checking whether Target Image size is within bounds for Predefined Architecture
+            if self.target_image_size[0] <32 or self.target_image_size[1]<32:
+                    Model_Target_Value_Checker()  #Check the Function Below which Raise the Value Error
+            print('\n\t\t-------Resnet50 Model Initiated Successfully----------\n')                     
+            return model_init.ResNet50()
+        
+        if self.model_name in ['Xception','xception']:
+            
+            # Checking whether Target Image size is within bounds for Predefined Architecture
+            if self.target_image_size[0] <71 or self.target_image_size[1]<71:
+                    Model_Target_Value_Checker()  #Check the Function Below which Raise the Value Error
+            print('\n\t\t-------Xception Model Initiated Successfully----------\n')                     
+            return model_init.Xception()
+        
+        if self.model_name in ['VGG16','Vgg16','vgg16']:
+            
+            # Checking whether Target Image size is within bounds for Predefined Architecture
+            if self.target_image_size[0] <32 or self.target_image_size[1]<32:
+                    Model_Target_Value_Checker()  #Check the Function Below which Raise the Value Error
+            print('\n\t\t-------VGG16 Model Initiated Successfully----------\n')                     
+            return model_init.VGG16()
     
-            
+        if self.model_name in ['VGG19','Vgg19','vgg19']:
+                    
+                    # Checking whether Target Image size is within bounds for Predefined Architecture
+                    if self.target_image_size[0] <32 or self.target_image_size[1]<32:
+                            Model_Target_Value_Checker()  #Check the Function Below which Raise the Value Error
+                    print('\n\t\t-------VGG19 Model Initiated Successfully----------\n')                     
+                    return model_init.VGG19()            
             
             
             
@@ -173,5 +226,16 @@ cnn.Preprocess_the_Image(model_name='mobilenetv2',num_classes = 10,batch_size = 
         
     
         
-        
+def Model_Target_Value_Checker():
+        raise ValueError('Try with Different Model.Get '
+             'information on Keras Documentation\n'
+             'The Lowest Dimensions allowed for Different Model are : \n'
+             'Try to change in Preprocess Images Process \n'
+             'MobileNetV2 --> (32,32) \n'
+             'InceptionV3 --> (75,75)\n'
+             'Resnet50 --> (32,32) \n'
+             'Xception --> (71,71) \n'
+             'VGG16 --> (32,32) \n'
+             'VGG19 --> (32,32) \n'
+             )
 
