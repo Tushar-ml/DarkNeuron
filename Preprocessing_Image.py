@@ -63,27 +63,27 @@ class Preprocess_Image:
         
         """
         #Based on Different Architecture of Models:
-        if self.model_name in ['mobilenetv2','mobilenet_v2']:
+        if self.model_name in ['mobilenetv2','MobileNetV2','mobilenet_v2','MobileNet_V2']:
             preprocess_function = tf.keras.applications.mobilenet_v2.preprocess_input
             return preprocess_function
         
-        if self.model_name in ['resnet50']:
+        if self.model_name in ['resnet50','ResNet50','Resnet50']:
             preprocess_function = tf.keras.applications.resnet50.preprocess_input
             return preprocess_function
         
-        if self.model_name in ['inceptionv3','inception_v3']:
+        if self.model_name in ['inceptionv3','InceptionV3','inception_v3','Inception_V3']:
             preprocess_function = tf.keras.applications.inception_v3.preprocess_input
             return preprocess_function
         
-        if self.model_name in ['vgg16']:
+        if self.model_name in ['VGG16','Vgg16','vgg16']:
             preprocess_function = tf.keras.applications.vgg16.preprocess_input
             return preprocess_function
         
-        if self.model_name in ['xception']:
+        if self.model_name in ['Xception','xception']:
             preprocess_function = tf.keras.applications.xception.preprocess_input
             return preprocess_function
         
-        if self.model_name in ['vgg19']:
+        if self.model_name in ['VGG19','Vgg19','vgg19']:
             preprocess_function = tf.keras.applications.vgg19.preprocess_input
             return preprocess_function
         
