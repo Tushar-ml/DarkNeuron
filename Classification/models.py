@@ -34,7 +34,8 @@ class Create_Model:
         self.working_directory = working_directory      # Working Directory
         self.train = train                              # Train or Predicting
         self.image_shape = image_shape                  # Image Shape
-    
+        
+            
     def MobileNetV2(self):
         """
         Initiatisation of Mobile Net V2 Model
@@ -58,7 +59,7 @@ class Create_Model:
             if not os.path.exists(weights_top):
                 print('Downloading MobileNetV2_weights...')
                 url = 'https://github.com/JonathanCMitchell/mobilenet_v2_keras/releases/download/v1.1/mobilenet_v2_weights_tf_dim_ordering_tf_kernels_0.5_224.h5'
-                wget.download(url,weights_no_top,bar=bar_progress)
+                wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
             model = tf.keras.applications.MobileNetV2(include_top=True,weights=weights_top)
@@ -87,7 +88,7 @@ class Create_Model:
             if not os.path.exists(weights_top):
                 print('Downloading InceptionV3_weights...')
                 url = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.5/inception_v3_weights_tf_dim_ordering_tf_kernels.h5'
-                wget.download(url,weights_no_top,bar=bar_progress)
+                wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
             model = tf.keras.applications.InceptionV3(include_top=True,weights=weights_top)
@@ -115,7 +116,7 @@ class Create_Model:
             if not os.path.exists(weights_top):
                 print('Downloading Resnet50_weights...')
                 url = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.2/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
-                wget.download(url,weights_no_top,bar=bar_progress)
+                wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
             model = tf.keras.applications.ResNet50(include_top=True,weights=weights_top)
@@ -143,7 +144,7 @@ class Create_Model:
             if not os.path.exists(weights_top):
                 print('Downloading Xception_weights...')
                 url = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.4/xception_weights_tf_dim_ordering_tf_kernels.h5'
-                wget.download(url,weights_no_top,bar=bar_progress)
+                wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
             model = tf.keras.applications.Xception(include_top=True,weights=weights_top)
@@ -171,7 +172,7 @@ class Create_Model:
             if not os.path.exists(weights_top):
                 print('Downloading VGG16_weights...')
                 url = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg16_weights_tf_dim_ordering_tf_kernels.h5'
-                wget.download(url,weights_no_top,bar=bar_progress)
+                wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
             model = tf.keras.applications.VGG16(include_top=True,weights=weights_top)
@@ -199,15 +200,15 @@ class Create_Model:
             if not os.path.exists(weights_top):
                 print('Downloading VGG19_weights...')
                 url = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg19_weights_tf_dim_ordering_tf_kernels.h5'
-                wget.download(url,weights_no_top,bar=bar_progress)
+                wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
             model = tf.keras.applications.VGG19(include_top=True,weights=weights_top)
         return model
 
 
-def Train_Model(model,num_classes,train_data_object,model_name,working_directory,output_directory,optimizer,loss,epochs,metrics,validation_data_object=None,fine_tuning=False,
-                layers = 20 , save_model = True,steps_per_epoch = 50):
+def Train_Model(model,num_classes,train_data_object,working_directory,output_directory,optimizer,loss,epochs,metrics,validation_data_object=None,fine_tuning=False,
+                layers = 20 , save_model = True,rebuild=False,steps_per_epoch = 50):
     """
     This Function will be used to train the Model and save the model to Output Directory
     
@@ -221,30 +222,7 @@ def Train_Model(model,num_classes,train_data_object,model_name,working_directory
     Returns :
         Trained Model
     """
-    if num_classes == 2:
-        target = num_classes - 1
-        activation = 'sigmoid'
-    else:
-        target = num_classes
-    activation = 'softmax'
-    model.trainable = False    
-    if fine_tuning:
-        #Fine tuning for Increasing the accuracy of the model
-        
-        model.trainable = True #Unfreeze all layer
-        layers_length = len(model.layers)
-        
-        if layers == 'all':
-            model.trainable = True
-        # Lets Freeze the Bottom Layers:
-        else:
-            freeze_layer_length = layers_length - layers
-            for layers in model.layers[:freeze_layer_length]:
-                layers.trainable = False
-            
-            for layers in model.layers[freeze_layer_length:]:
-                layers.trainable = True
-
+    
     log_directory = os.path.join(working_directory,'\logs')
     model_checkpoint_directory = os.path.join(working_directory,'\model_checkpoint')            
     if not os.path.exists(log_directory):
@@ -252,11 +230,47 @@ def Train_Model(model,num_classes,train_data_object,model_name,working_directory
     
     if not os.path.exists(model_checkpoint_directory):
         os.mkdir(model_checkpoint_directory)
+    if num_classes == 2:
+            target = num_classes - 1
+            activation = 'sigmoid'
+    else:
+            target = num_classes
+            activation = 'softmax'
+    if rebuild:
+        
+        model.trainable = False    
+        if fine_tuning:
+            #Fine tuning for Increasing the accuracy of the model
+            
+            model.trainable = True #Unfreeze all layer
+            layers_length = len(model.layers)
+            
+            if layers == 'all':
+                model.trainable = True
+            # Lets Freeze the Bottom Layers:
+            else:
+                freeze_layer_length = layers_length - layers
+                for layers in model.layers[:freeze_layer_length]:
+                    layers.trainable = False
+                
+                for layers in model.layers[freeze_layer_length:]:
+                    layers.trainable = True
     
-    layer1 = tf.keras.layers.GlobalAveragePooling2D()(model.output)
-    output = tf.keras.layers.Dense(target,activation=activation)(layer1)
-    
-    New_Model = tf.keras.models.Model(inputs = model.input , outputs = output)
+        
+        
+        layer1 = tf.keras.layers.GlobalAveragePooling2D()
+        output = tf.keras.layers.Dense(target,activation=activation)
+        print('Build Successfully')
+        N_Model = tf.keras.models.Sequential()
+        N_Model.add(model)
+        N_Model.add(layer1)
+        N_Model.add(output)
+        print(N_Model.summary())
+        New_Model = N_Model
+    else:
+        New_Model = model
+        if New_Model.output_shape[1] != target:
+            raise ValueError('Correct the Number of Classes')
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=5, min_lr=0.001)
     my_callbacks = [tf.keras.callbacks.EarlyStopping(patience=2),
@@ -268,14 +282,14 @@ def Train_Model(model,num_classes,train_data_object,model_name,working_directory
     New_Model.compile(loss = loss,optimizer = optimizer,metrics = [metrics])
     if validation_data_object is None:
         
-        history = New_Model.fit_generator(train_data_object,steps_per_epoch = 50,epochs= epochs, callbacks = my_callbacks)
+        history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs= epochs, callbacks = my_callbacks)
         
     else:
         
-        history = New_Model.fit_generator(train_data_object,steps_per_epoch = 3,epochs=epochs,validation_data = validation_data_object,
+        history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs=epochs,validation_data = validation_data_object,
                             callbacks = my_callbacks)
         
-
+        
     return history,New_Model
 
  

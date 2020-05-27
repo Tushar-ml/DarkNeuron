@@ -13,14 +13,16 @@ Different Architectures:
     --> Resnet50
 
 """
-from Deep_Stack import Deep_Stack
+from .Deep_Stack import Deep_Stack
 import  tensorflow as tf            # Powerful Framework for Deep Learning
-import keras                        # A Deep Learning API 
 import os                           # For Searching Folder within the system
-from models import Create_Model, Train_Model           # Script containing Different Models
-from Preprocessing_Image import Preprocess_Image      #Preprocessing Image Script
+from .models import Create_Model, Train_Model           # Script containing Different Models
+from .Preprocessing_Image import Preprocess_Image      #Preprocessing Image Script
+from .Prediction import Prediction
+import matplotlib.pyplot as plt
+
  
-class CNN(Deep_Stack):
+class Classify_Images(Deep_Stack):
     """
     This Class will have Following Properties:
         
@@ -33,10 +35,10 @@ class CNN(Deep_Stack):
         --Create_the_Model
         --Train_the_Model
         --Predict_from_the_Model
-        --Visualize_the_Model
+        --Visualize_the_Metric
         --Deploy_the_Model
     """
-    def __init__(self,working_directory,output_directory,target_image_size=(224,224,3),train=False):
+    def __init__(self,working_directory,output_directory):
         """
         In this function we will call Parent Function containing other Function
         
@@ -48,35 +50,24 @@ class CNN(Deep_Stack):
             
             output_directory --> Output Sirectory to which Results will be posted
             
-            Image_Folder_name --> Different Model Name for Different Models
-            
-            Train --> False Or True (For Prediction)
-            
         Output:
         ------    
             None
         
         """
         Deep_Stack.__init__(self,working_directory,output_directory)
-        self.epochs = 10                    #Initializing Epochs
-        self.loss = 'binary_crossentropy' 
-        self.optimizer = 'adam'
-        self.train = train
-        self.target_image_size = target_image_size
-
-        print('\t\t--------------------------------------')
-        print('\t\t| Step:1 Call Preprocess_the_Image() |')
-        print('\t\t--------------------------------------')
-
         self.working_directory = working_directory
         self.output_directory = output_directory
-
+        
+    def load_model(self,user_model_name):
+        user_model_path = os.path.join(self.working_directory,user_model_name)
+        return tf.keras.models.load_model(user_model_path)
 
     """
     Defining Preprocess Function to Preprocess the Images with Different Flow Method
     
     """
-    def Preprocess_the_Image(self,model_name,num_classes,method,batch_size=32,training_image_directory=None,validation_image_directory=None,dataframe=None,
+    def Preprocess_the_Image(self,method,train,num_classes,batch_size=32,target_size=(224,224,3),model_name = None,user_model = None,image_path=None,grayscale=None,training_image_directory=None,validation_image_directory=None,dataframe=None,
                             test_image_directory=None,x_train=None,x_test=None,y_train=None,y_test=None,x_col=None,y_col = None,split=0.1,image_directory=None):
         """
         This function Will do image processing and return training Data Generator, Validation Data Generator
@@ -96,6 +87,8 @@ class CNN(Deep_Stack):
             It will Return the Data Generator for Train and Test
         
         """
+        self.train = train
+        self.target_image_size = target_size
         self.model_name = model_name
         self.num_classes = num_classes
         self.batch_size = batch_size
@@ -112,8 +105,12 @@ class CNN(Deep_Stack):
         self.y_col_name = y_col
         self.split = split
         self.image_directory = image_directory
+        if user_model is not None:
+            self.user_model = user_model
+        else:
+            self.user_model = None
         #Defining Variables for Preprocessing
-        preprocessing = Preprocess_Image(self.model_name,self.num_classes,self.batch_size,self.target_image_size,self.train)
+        preprocessing = Preprocess_Image(model_name=self.model_name,user_model=self.user_model,num_classes = self.num_classes,batch_size=self.batch_size,training=self.train,method=self.method,working_directory = self.working_directory)
         
         #Getting results based on Different flow methods
         if self.method == 'directory':
@@ -121,7 +118,7 @@ class CNN(Deep_Stack):
             if self.train:# From Preprocessing_Image.py File
                 train_data,validation_data = preprocessing.Get_Images_from_Directory(self.training_directory,self.validation_directory,self.test_directory)
                 print('\n\t\t-------Training Data Generated--------\n')
-                return train_data,validation_data
+                return train_data,validation_data,(train_data.class_indices)
             else:
                 test_data = preprocessing.Get_Images_from_Directory(self.training_directory,self.validation_directory,
                                                                     self.test_directory)
@@ -134,7 +131,7 @@ class CNN(Deep_Stack):
                 train_data,validation_data = preprocessing.Get_Images_from_DataFrame(self.dataframe,self.x_col_name,self.split,self.y_col_name,self.image_directory)
                 print('\n\t\t-----Training Data Generated------\n')
                 
-                return train_data,validation_data
+                return train_data,validation_data,(train_data.class_indices)
             
             else:
                 test_data = preprocessing.Get_Images_from_DataFrame(self.dataframe,self.x_col_name,self.split,self.y_col_name,self.image_directory)
@@ -153,11 +150,20 @@ class CNN(Deep_Stack):
                 print('\n\t\t---------Test Data Generated--------\n')
                 return test_data
             
+        elif self.method == 'image':
+            if image_path is None:
+                raise ValueError('Provide Image Path for Image Prediction or If it is containing in a directory having multiple ',
+                                 'images, then set method = "directory"')
+            print('\n\t\t----------Getting Image -------------\n')
+            image = preprocessing.Get_Image(image_path = image_path,model_name = self.model_name,user_model=user_model,
+                                            grayscale=grayscale)
+            return image
+       
         else:
             
-            raise ValueError('Invalid Method Input --Must be from "directory","dataframe","point"')
+            raise ValueError('Invalid Method Input --Must be from "directory","dataframe","point","image"')
             
-
+            
 
 
 
@@ -175,8 +181,9 @@ class CNN(Deep_Stack):
             
         """
         print('\n\t\t--------------Model Creation Phase-----------\n')
+    
         
-        model_init = Create_Model(self.working_directory,self.target_image_size,self.train)
+        model_init = Create_Model(working_directory=self.working_directory,image_shape = self.target_image_size,train = self.train)
         
         # Defining Model based on Model name:
         if self.model_name in ['mobilenetv2','MobileNetV2','mobilenet_v2','MobileNet_V2']:
@@ -232,21 +239,101 @@ class CNN(Deep_Stack):
             
             
         
-    def Train_the_Model(self,model,train_data_object=None,validation_data_object=None,test_data_object=None,epochs = 10,optimizer='adam',loss = 'binary_crossentropy',fine_tuning = False,layers = 20,metrics='accuracy',save_model = True,steps_per_epoch = 50):
+    def Train_the_Model(self,model,rebuild=False,train_data_object=None,validation_data_object=None,test_data_object=None,epochs = 10,optimizer='adam',loss = 'binary_crossentropy',fine_tuning = False,layers = 20,metrics='accuracy',save_model = True,steps_per_epoch = 50):
         """
         This function will call up the Initialised Model 
         
         """
         
         print('\n\t\t------------Model Training To be Start---------------')
-        history,model = Train_Model(model=model,num_classes = self.num_classes,train_data_object=train_data_object,model_name = self.model_name,
+        history,model = Train_Model(model=model,rebuild=rebuild,num_classes = self.num_classes,train_data_object=train_data_object,
                                     working_directory = self.working_directory,output_directory = self.output_directory,loss = loss,epochs=epochs,
                                     optimizer = optimizer,metrics = metrics,validation_data_object = validation_data_object,fine_tuning = fine_tuning,
                                     layers = layers,save_model=save_model,steps_per_epoch = steps_per_epoch)
         self.model_history = history
-        return history,model
+        return model
+    
+    def Visualize_the_Metric(self):
+        import matplotlib.pyplot as plt
+        # Plot for Training Loss and Training Accuracy
+        plt.plot(self.model_history.history['loss'],label='Training Loss')
+        plt.plot(self.model_history.history['acc'],label = 'Training Accuracy')
+        plt.title('Training Loss vs Training Accuracy')
+        plt.legend()
+        plt.show()
+        #excetuted when validation set will be there
+        try:
+            # Training Loss vs Vaidation Loss 
+            plt.plot(self.model_history.history['val_loss'],label='Test Loss')
+            plt.plot(self.model_history.history['loss'],label = 'Training Loss')
+            plt.title('Training Loss vs Validation Loss')
+            plt.legend()
+            plt.show()
+            
+            plt.plot(self.model_history.history['acc'],label='Training Accuracy')
+            plt.plot(self.model_history.history['val_acc'],label = 'Validation Accuracy')
+            plt.title('Validation Loss vs Validation Accuracy')
+            plt.legend()
+            plt.show()
         
+        except:
+            pass
+    
+    def Predict_from_the_Model(self,labels,generator=None,img = None,top = 5,model=None):
+        """
+        This Function will be used to predict the classes from Model
         
+        Arguments:
+            preprocessed_image --> preprocessed_image suitable for model
+            model --> model get from trained part
+            top --> Number of High Probabilities
+            
+        Return:
+            Classes
+        
+        """
+        prediction = Prediction(working_directory = self.working_directory,labels = labels,method = self.method,
+                                model_name = self.model_name,user_model=self.user_model,
+                                img = img,top=top)
+        
+        if self.user_model is not None:
+            model = self.user_model
+        else:
+            if model is None:
+                raise ValueError('Provide Model, model argument should not be empty')
+            model = model
+        predicted_indices,predictions = prediction.prediction(method=self.method,model=model,img=img,data_generator=generator)
+        
+        label_score = prediction.label_class_provider(label=labels,predictions=predictions,predicted_indices=predicted_indices,
+                                                      generator=generator,img=img)
+        print('\n\t\t--------------Generating Predictions with Score----------------')
+        
+        self.label_score = label_score
+        if len(label_score) == 0:
+            print('\n\t\t----------No Predictions-----------')
+            return label_score
+        
+        else:
+            print(f'\n\t\t------------Found {len(label_score)} Predicitons-------' )
+            return label_score
+        
+    def Visualize_the_Predictions(self,number=6):
+        if number > len(self.label_score):
+            number = len(self.label_score)
+            
+        if number ==0:
+            print('No predictions to Show')
+       
+        
+        else:
+            for label_score in self.label_score[:number]:
+                filepath = os.path.join(self.test_directory,label_score[0])
+                img = plt.imread(filepath)
+                plt.imshow(img)
+                plt.title(f'Predicted:{label_score[1].title()} ---- Score: {label_score[2]*100}')
+                plt.show()
+            
+            
 def Model_Target_Value_Checker():
         raise ValueError('Try with Different Model.Get '
              'information on Keras Documentation\n'
@@ -259,4 +346,5 @@ def Model_Target_Value_Checker():
              'VGG16 --> (32,32) \n'
              'VGG19 --> (32,32) \n'
              )
+
 

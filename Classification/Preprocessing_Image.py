@@ -9,9 +9,12 @@ Author: Tushar Goel
 
 """
 import tensorflow as tf
+from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np
 from keras.utils.np_utils import to_categorical
+from .Prediction import Prediction
+
 class Preprocess_Image:
     """
     This Class will be Preprocessing Feature based on differnt Different Models and Differnt Methods for custom image 
@@ -21,7 +24,7 @@ class Preprocess_Image:
     Attributes:
     -----------
             model_name --> Differnt Architecture Models based On ImageNet 
-            num_classes --> 2(Default) Number of Classes or Number of Objects to  
+            num_classes --> 2(Default) Number of Classes or Number of Objects to Process 
              
     Methods:
     --------
@@ -31,12 +34,11 @@ class Preprocess_Image:
            
     """
     
-    def __init__(self,model_name=None,num_classes=2,batch_size=32,target_image_size=(224,224,3),training=False):
-        if model_name==None:
-            raise ValueError('Define The Predefine Architecture Name. It is a required Variable for Training')
+    def __init__(self,model_name=None,user_model = None,num_classes=2,batch_size=32,target_image_size=(224,224,3),training=False,method='directory',working_directory=None):
         
-        self.model_name=model_name.lower()
-        
+        self.user_model=user_model
+        self.model_name=model_name
+        self.method_name = method
         self.training = training
         if num_classes==2:
             self.class_mode='binary'                    # Creating Class Mode for Image Data Processing
@@ -46,9 +48,10 @@ class Preprocess_Image:
         self.target_image_size = target_image_size
             
         print('\t\t----------------------------\n')
-        print('\t\t  Image Preprocessing Phase\n')
+        print('\t\t Image Preprocessing Phase\n')
         print('\t\t----------------------------')
         
+        self.pred = Prediction(method = self.method_name,user_model=self.user_model,model_name=self.model_name,working_directory = working_directory)
         
         
     def preprocess_architecture_function(self):
@@ -63,29 +66,36 @@ class Preprocess_Image:
         
         """
         #Based on Different Architecture of Models:
-        if self.model_name in ['mobilenetv2','MobileNetV2','mobilenet_v2','MobileNet_V2']:
-            preprocess_function = tf.keras.applications.mobilenet_v2.preprocess_input
-            return preprocess_function
-        
-        if self.model_name in ['resnet50','ResNet50','Resnet50']:
-            preprocess_function = tf.keras.applications.resnet50.preprocess_input
-            return preprocess_function
-        
-        if self.model_name in ['inceptionv3','InceptionV3','inception_v3','Inception_V3']:
-            preprocess_function = tf.keras.applications.inception_v3.preprocess_input
-            return preprocess_function
-        
-        if self.model_name in ['VGG16','Vgg16','vgg16']:
-            preprocess_function = tf.keras.applications.vgg16.preprocess_input
-            return preprocess_function
-        
-        if self.model_name in ['Xception','xception']:
-            preprocess_function = tf.keras.applications.xception.preprocess_input
-            return preprocess_function
-        
-        if self.model_name in ['VGG19','Vgg19','vgg19']:
-            preprocess_function = tf.keras.applications.vgg19.preprocess_input
-            return preprocess_function
+        if self.user_model is not None:
+            pass
+        else:
+            if self.model_name is None:
+                raise ValueError('Provide Model name or Provide user model')
+            if self.model_name in ['mobilenetv2','MobileNetV2','mobilenet_v2','MobileNet_V2']:
+                preprocess_function = tf.keras.applications.mobilenet_v2.preprocess_input
+                return preprocess_function
+            
+            elif self.model_name in ['resnet50','ResNet50','Resnet50']:
+                preprocess_function = tf.keras.applications.resnet50.preprocess_input
+                return preprocess_function
+            
+            elif self.model_name in ['inceptionv3','InceptionV3','inception_v3','Inception_V3']:
+                preprocess_function = tf.keras.applications.inception_v3.preprocess_input
+                return preprocess_function
+            
+            elif self.model_name in ['VGG16','Vgg16','vgg16']:
+                preprocess_function = tf.keras.applications.vgg16.preprocess_input
+                return preprocess_function
+            
+            elif self.model_name in ['Xception','xception']:
+                preprocess_function = tf.keras.applications.xception.preprocess_input
+                return preprocess_function
+            
+            elif self.model_name in ['VGG19','Vgg19','vgg19']:
+                preprocess_function = tf.keras.applications.vgg19.preprocess_input
+                return preprocess_function
+            else:
+                raise ValueError('Invalid Model Name')
         
     def Get_Images_from_Directory(self,training_images_directory=None,validation_images_directory=None,test_image_directory=None):
         
@@ -115,8 +125,10 @@ class Preprocess_Image:
             raise ValueError('Required 3 Arguments --- {} are given'.format(len(target_image_size)))
             
         #Defining Preprocessing Function
-        preprocessing_function = self.preprocess_architecture_function()
-        
+        if self.user_model is not None:
+            preprocessing_function = None
+        else:
+            preprocessing_function = self.preprocess_architecture_function()
         # Data Generator Function for preprocessing Function
         data_generator = ImageDataGenerator(preprocessing_function = preprocessing_function,
                                                 rescale=1./255,
@@ -126,10 +138,13 @@ class Preprocess_Image:
         
         if self.training:
             if training_images_directory is None:
-                raise ValueError('For Training Image Directory is Must')
-            # Train Data Generator for 
+                raise ValueError('For Training Image Directory is Must, or put training mode to False and use test_image_directory')
+            # Train Data Generator for Training
+            
+            if self.user_model is not None:
+                self.target_image_size = self.user_model.input_shape[1:3]
             train_data_generator = data_generator.flow_from_directory(directory = training_images_directory,
-                                                                      target_size = (target_image_size[0],target_image_size[1]),
+                                                                      target_size = (self.target_image_size[0],self.target_image_size[1]),
                                                                       batch_size = self.batch_size,
                                                                       class_mode = self.class_mode)
             #Checking Validation Data Directory , If exists return train and validation data generator
@@ -145,10 +160,13 @@ class Preprocess_Image:
             if test_image_directory is None:
                 raise ValueError('Test Image Directory Required for Prediction')
             # Data Generator Function for preprocessing Function
+            target_size = self.pred.target_shape_generator()
             data_generator = ImageDataGenerator(
                                                 rescale = 1./255)
-            test_data_generator = data_generator.flow_from_directory(directory = training_images_directory,
-                                                                     target_size = (target_image_size[0],target_image_size[1])
+            test_data_generator = data_generator.flow_from_directory(directory = test_image_directory,
+                                                                     target_size = target_size,
+                                                                     shuffle=False
+                                                                     
                                                                      )
             return test_data_generator
             
@@ -177,7 +195,7 @@ class Preprocess_Image:
         
         # Data Generator Function for preprocessing Function
         data_generator = ImageDataGenerator(preprocessing_function = preprocessing_function,
-                                            reshape = 1./255)
+                                            rescale = 1./255)
         
         #Splitting Functions for training and Predictions :
         if self.training:
@@ -191,7 +209,9 @@ class Preprocess_Image:
             
             if y_column_name is None:
                 raise ValueError(' For Training Y Columns is required')
-            # Train Data Generator for 
+            # Train Data Generator for Training
+            if self.user_model is not None:
+                self.target_image_size = self.user_model.input_shape[1:3]
             train_data_generator = data_generator.flow_from_dataframe(dataframe=training_dataframe,
                                                                       directory = image_directory,
                                                                       x_col = x_column_name,
@@ -216,11 +236,13 @@ class Preprocess_Image:
         
         else:
             # Test Data Generator 
+            target_size = self.pred.target_shape_generator()
             test_data_generator = data_generator.flow_from_dataframe(dataframe=dataframe,
                                                                       directory = image_directory,
                                                                       x_col = x_column_name,
                                                                       y_col = y_column_name,
-                                                                      target_size = (self.target_image_size[0],self.target_image_size[1]),
+                                                                      target_size = target_size,
+                                                                      shuffle=False
                                                                      )
             return test_data_generator
         
@@ -242,8 +264,9 @@ class Preprocess_Image:
         # Data Generator Function for preprocessing Function
         data_generator = ImageDataGenerator(preprocessing_function,
                                             rescale = 1./255)
-        x_train = np.expand_dims(x_train,axis=-1)
-        x_test = np.expand_dims(x_test,axis=-1)
+        if len(x_train.shape)==3:
+            x_train = np.expand_dims(x_train,axis=-1)
+            x_test = np.expand_dims(x_test,axis=-1)
         
         y_train = to_categorical(y_train)
         y_test = to_categorical(y_test)
@@ -269,10 +292,43 @@ class Preprocess_Image:
             return test_data_generator
         
     
+    def Get_Image(self,image_path,model_name = None,user_model= None,grayscale = False):
+        """
+        This Function will be for Image Processing for Single Images not on any Directory
         
-        
+        Arguments:
+            model_name --> Model Name for PreDefined Architecture: None(Default)
+            user_model --> Path to user own Model if they have Predefined Models : None(Default)
             
+            target_image_size --> This will be the target image size user model or Predefined Architecture Model
+            image_path --> Image Path which is to be Predicted
+    
+        Returns:
+            
+            This Function will Return the Preprocessed Image
+            
+        """
+        target_shape = self.pred.target_shape_generator()
         
+        if user_model is not None:
+            
+            img = image.load_img(image_path,grayscale=grayscale,target_size=target_shape)
+            img = image.img_to_array(img)
+            img = np.expand_dims(img,axis=0)
+            
+            return img
+        
+        else:
+             # Recalling Function from Above for different models
+            
+            img = image.load_img(image_path,grayscale=grayscale,target_size=target_shape)
+            img = image.img_to_array(img)
+            img = np.expand_dims(img,axis=0)
+            
+            return img
+
+            
+
         
         
         
