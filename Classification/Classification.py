@@ -13,7 +13,7 @@ Different Architectures:
     --> Resnet50
 
 """
-from .Deep_Stack import Deep_Stack
+from .Deep_Stack_CNN import Deep_Stack
 import  tensorflow as tf            # Powerful Framework for Deep Learning
 import os                           # For Searching Folder within the system
 from .models import Create_Model, Train_Model           # Script containing Different Models
@@ -67,8 +67,8 @@ class Classify_Images(Deep_Stack):
     Defining Preprocess Function to Preprocess the Images with Different Flow Method
     
     """
-    def Preprocess_the_Image(self,method,train,num_classes,batch_size=32,target_size=(224,224,3),model_name = None,user_model = None,image_path=None,grayscale=None,training_image_directory=None,validation_image_directory=None,dataframe=None,
-                            test_image_directory=None,x_train=None,x_test=None,y_train=None,y_test=None,x_col=None,y_col = None,split=0.1,image_directory=None):
+    def Preprocess_the_Image(self,method,train,num_classes,batch_size=32,target_image_size=(224,224,3),model_name = None,user_model = None,image_path=None,grayscale=None,training_image_directory=None,validation_image_directory=None,dataframe=None,
+                            test_image_directory=None,x_train=None,x_test=None,y_train=None,y_test=None,x_col=None,y_col = None,split=0.1,image_directory=None,input_tensor=None):
         """
         This function Will do image processing and return training Data Generator, Validation Data Generator
         
@@ -88,7 +88,7 @@ class Classify_Images(Deep_Stack):
         
         """
         self.train = train
-        self.target_image_size = target_size
+        self.target_image_size = target_image_size
         self.model_name = model_name
         self.num_classes = num_classes
         self.batch_size = batch_size
@@ -105,12 +105,14 @@ class Classify_Images(Deep_Stack):
         self.y_col_name = y_col
         self.split = split
         self.image_directory = image_directory
+        self.input_tensor = input_tensor
+        self.image_path = image_path
         if user_model is not None:
             self.user_model = user_model
         else:
             self.user_model = None
         #Defining Variables for Preprocessing
-        preprocessing = Preprocess_Image(model_name=self.model_name,user_model=self.user_model,num_classes = self.num_classes,batch_size=self.batch_size,training=self.train,method=self.method,working_directory = self.working_directory)
+        preprocessing = Preprocess_Image(model_name=self.model_name,user_model=self.user_model,target_image_size = self.target_image_size,num_classes = self.num_classes,batch_size=self.batch_size,training=self.train,method=self.method,working_directory = self.working_directory)
         
         #Getting results based on Different flow methods
         if self.method == 'directory':
@@ -183,7 +185,7 @@ class Classify_Images(Deep_Stack):
         print('\n\t\t--------------Model Creation Phase-----------\n')
     
         
-        model_init = Create_Model(working_directory=self.working_directory,image_shape = self.target_image_size,train = self.train)
+        model_init = Create_Model(working_directory=self.working_directory,image_shape = self.target_image_size,train = self.train,input_tensor=self.input_tensor)
         
         # Defining Model based on Model name:
         if self.model_name in ['mobilenetv2','MobileNetV2','mobilenet_v2','MobileNet_V2']:
@@ -239,7 +241,7 @@ class Classify_Images(Deep_Stack):
             
             
         
-    def Train_the_Model(self,model,rebuild=False,train_data_object=None,validation_data_object=None,test_data_object=None,epochs = 10,optimizer='adam',loss = 'binary_crossentropy',fine_tuning = False,layers = 20,metrics='accuracy',save_model = True,steps_per_epoch = 50):
+    def Train_the_Model(self,model,rebuild=False,train_data_object=None,validation_data_object=None,test_data_object=None,epochs = 10,optimizer='adam',loss = 'binary_crossentropy',fine_tuning = False,layers = 20,metrics='accuracy',validation_steps=80,save_model = True,steps_per_epoch = 50,callbacks=None):
         """
         This function will call up the Initialised Model 
         
@@ -249,11 +251,11 @@ class Classify_Images(Deep_Stack):
         history,model = Train_Model(model=model,rebuild=rebuild,num_classes = self.num_classes,train_data_object=train_data_object,
                                     working_directory = self.working_directory,output_directory = self.output_directory,loss = loss,epochs=epochs,
                                     optimizer = optimizer,metrics = metrics,validation_data_object = validation_data_object,fine_tuning = fine_tuning,
-                                    layers = layers,save_model=save_model,steps_per_epoch = steps_per_epoch)
+                                    layers = layers,validation_steps=validation_steps,save_model=save_model,steps_per_epoch = steps_per_epoch,callbacks=callbacks)
         self.model_history = history
         return model
     
-    def Visualize_the_Metric(self):
+    def Visualize_the_Metrics(self):
         import matplotlib.pyplot as plt
         # Plot for Training Loss and Training Accuracy
         plt.plot(self.model_history.history['loss'],label='Training Loss')
@@ -272,6 +274,12 @@ class Classify_Images(Deep_Stack):
             
             plt.plot(self.model_history.history['acc'],label='Training Accuracy')
             plt.plot(self.model_history.history['val_acc'],label = 'Validation Accuracy')
+            plt.title('Training Accuracy vs Validation Accuracy')
+            plt.legend()
+            plt.show()
+            
+            plt.plot(self.model_history.history['val_loss'],label='Validation_Loss')
+            plt.plot(self.model_history.history['val_acc'],label = 'Validation_Accuracy')
             plt.title('Validation Loss vs Validation Accuracy')
             plt.legend()
             plt.show()
@@ -279,7 +287,7 @@ class Classify_Images(Deep_Stack):
         except:
             pass
     
-    def Predict_from_the_Model(self,labels,generator=None,img = None,top = 5,model=None):
+    def Predict_from_the_Model(self,labels=None,generator=None,img = None,top = 5,model=None):
         """
         This Function will be used to predict the classes from Model
         
@@ -292,9 +300,11 @@ class Classify_Images(Deep_Stack):
             Classes
         
         """
+        self.generator = generator
+        self.img = img
         prediction = Prediction(working_directory = self.working_directory,labels = labels,method = self.method,
                                 model_name = self.model_name,user_model=self.user_model,
-                                img = img,top=top)
+                                img = img,top=top,image_directory=self.image_path)
         
         if self.user_model is not None:
             model = self.user_model
@@ -326,12 +336,20 @@ class Classify_Images(Deep_Stack):
        
         
         else:
-            for label_score in self.label_score[:number]:
-                filepath = os.path.join(self.test_directory,label_score[0])
-                img = plt.imread(filepath)
-                plt.imshow(img)
-                plt.title(f'Predicted:{label_score[1].title()} ---- Score: {label_score[2]*100}')
-                plt.show()
+            if self.generator is not None:
+                for label_score in self.label_score[:number]:
+                    filepath = os.path.join(self.test_directory,label_score[0])
+                    img = plt.imread(filepath)
+                    plt.imshow(img)
+                    plt.title(f'Predicted:{label_score[1].title()} ---- Score: {label_score[2]*100}')
+                    plt.show()
+            elif self.img is not None:
+                for label_score in self.label_score[:number]:
+                    filepath = label_score[0]
+                    img = plt.imread(filepath)
+                    plt.imshow(img)
+                    plt.title(f'Predicted:{label_score[1].title()} ---- Score: {label_score[2]*100}')
+                    plt.show()
             
             
 def Model_Target_Value_Checker():

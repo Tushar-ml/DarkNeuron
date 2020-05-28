@@ -165,8 +165,8 @@ class Preprocess_Image:
                                                 rescale = 1./255)
             test_data_generator = data_generator.flow_from_directory(directory = test_image_directory,
                                                                      target_size = target_size,
-                                                                     shuffle=False
-                                                                     
+                                                                     shuffle=False,
+                                                                     batch_size = 1
                                                                      )
             return test_data_generator
             
@@ -242,7 +242,8 @@ class Preprocess_Image:
                                                                       x_col = x_column_name,
                                                                       y_col = y_column_name,
                                                                       target_size = target_size,
-                                                                      shuffle=False
+                                                                      shuffle=False,
+                                                                      batch_size = 1
                                                                      )
             return test_data_generator
         

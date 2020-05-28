@@ -29,12 +29,12 @@ class Create_Model:
             VGG19
     """
     
-    def __init__(self,working_directory,image_shape=(224,224,3),train=False):
+    def __init__(self,working_directory,image_shape=(224,224,3),train=False,input_tensor=None):
         
         self.working_directory = working_directory      # Working Directory
         self.train = train                              # Train or Predicting
         self.image_shape = image_shape                  # Image Shape
-        
+        self.input_tensor=input_tensor
             
     def MobileNetV2(self):
         """
@@ -62,7 +62,7 @@ class Create_Model:
                 wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
-            model = tf.keras.applications.MobileNetV2(include_top=True,weights=weights_top)
+            model = tf.keras.applications.MobileNetV2(include_top=True,weights=weights_top,input_tensor=self.input_tensor)
         return model
     
     def InceptionV3(self):
@@ -91,7 +91,7 @@ class Create_Model:
                 wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
-            model = tf.keras.applications.InceptionV3(include_top=True,weights=weights_top)
+            model = tf.keras.applications.InceptionV3(include_top=True,weights=weights_top,input_tensor=self.input_tensor)
         return model
         
     def ResNet50(self):
@@ -108,7 +108,7 @@ class Create_Model:
                 wget.download(url,weights_no_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
-            model = tf.keras.applications.ResNet50(include_top=False,input_shape=self.image_shape,weights=weights_no_top)
+            model = tf.keras.applications.ResNet50(include_top=False,input_shape=self.image_shape,weights=weights_no_top,)
             
         else:
             weights_top = os.path.join(self.working_directory,'ResNet50_model.h5')
@@ -119,7 +119,7 @@ class Create_Model:
                 wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
-            model = tf.keras.applications.ResNet50(include_top=True,weights=weights_top)
+            model = tf.keras.applications.ResNet50(include_top=True,weights=weights_top,input_tensor=self.input_tensor)
         return model
     
     def Xception(self):
@@ -147,7 +147,7 @@ class Create_Model:
                 wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
-            model = tf.keras.applications.Xception(include_top=True,weights=weights_top)
+            model = tf.keras.applications.Xception(include_top=True,weights=weights_top,input_tensor=self.input_tensor)
         return model
     
     def VGG16(self):
@@ -175,7 +175,7 @@ class Create_Model:
                 wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
-            model = tf.keras.applications.VGG16(include_top=True,weights=weights_top)
+            model = tf.keras.applications.VGG16(include_top=True,weights=weights_top,input_tensor=self.input_tensor)
         return model
 
     def VGG19(self):
@@ -203,12 +203,12 @@ class Create_Model:
                 wget.download(url,weights_top,bar=bar_progress)
                 print('\n---------Weight Downloaded-------------')
             print('\nWeights Loaded\n')
-            model = tf.keras.applications.VGG19(include_top=True,weights=weights_top)
+            model = tf.keras.applications.VGG19(include_top=True,weights=weights_top,input_tensor=self.input_tensor)
         return model
 
 
 def Train_Model(model,num_classes,train_data_object,working_directory,output_directory,optimizer,loss,epochs,metrics,validation_data_object=None,fine_tuning=False,
-                layers = 20 , save_model = True,rebuild=False,steps_per_epoch = 50):
+                layers = 20 , save_model = True,validation_steps=80,rebuild=False,steps_per_epoch = 50,callbacks=False):
     """
     This Function will be used to train the Model and save the model to Output Directory
     
@@ -271,24 +271,28 @@ def Train_Model(model,num_classes,train_data_object,working_directory,output_dir
         New_Model = model
         if New_Model.output_shape[1] != target:
             raise ValueError('Correct the Number of Classes')
-    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=5, min_lr=0.001)
-    my_callbacks = [tf.keras.callbacks.EarlyStopping(patience=2),
-                    #tf.keras.callbacks.ModelCheckpoint(filepath=os.path.join(model_checkpoint_directory,'model.{epoch:02d}-{val_loss:.2f}.h5')),
-                    tf.keras.callbacks.TensorBoard(log_dir=log_directory),
-                    reduce_lr
-                    ]
     
-    New_Model.compile(loss = loss,optimizer = optimizer,metrics = [metrics])
-    if validation_data_object is None:
+    if callbacks:
+        my_callbacks = callbacks
         
-        history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs= epochs, callbacks = my_callbacks)
-        
+        New_Model.compile(loss = loss,optimizer = optimizer,metrics = [metrics])
+        if validation_data_object is None:
+            
+            history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs= epochs, callbacks = my_callbacks)
+            
+        else:
+            
+            history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs=epochs,validation_data = validation_data_object,
+                                callbacks = my_callbacks)
     else:
-        
-        history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs=epochs,validation_data = validation_data_object,
-                            callbacks = my_callbacks)
-        
+        New_Model.compile(loss = loss,optimizer = optimizer,metrics = [metrics])
+        if validation_data_object is None:
+            
+            history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs= epochs)
+            
+        else:
+            
+            history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs=epochs,validation_data = validation_data_object,validation_steps=validation_steps)
         
     return history,New_Model
 
