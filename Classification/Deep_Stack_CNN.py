@@ -17,7 +17,7 @@ class Deep_Stack:
     
     of Images, Certain Predefined Models """
     
-    def __init__(self,working_directory,output_directory):
+    def __init__(self,working_directory=None,output_directory=None):
         """
         This Function will take the Directory of Data to be used
         
@@ -31,7 +31,3 @@ class Deep_Stack:
         print('\t\tWelcome To The DEEPSTACK\n')
         print('\t\t########################\n')
               
-    def Teach_Me(self):
-        pass
-              
-        
