@@ -165,7 +165,7 @@ class Image_Annotation:
     def csv_from_text(self,class_list_file_name):
         
         text_file_paths = glob(os.path.join(self.working_directory,'*.txt'))
-        image_file_paths = glob(os.path.join(self.working_directory,'*.jpg'))
+        image_file_paths = self.GetFileList(self.working_directory,['.jpg','.jpeg','.png'])
         #Removing Class_text file from text path:
         
         class_file_text = os.path.join(self.working_directory,class_list_file_name)
@@ -188,17 +188,23 @@ class Image_Annotation:
         label = []
         df = pd.DataFrame()
         
-        
         for text_file in text_file_paths:
-            image_file_name = text_file.split('\\')[-1].split('.')[0]
-            image_path = text_file.split('.')[0]+'.jpg'
+            for i in image_file_paths:
+                try:
+                    if text_file.split('\\')[-1].split('.')[0] == i.split('\\')[-1].split('.')[0]:
+                        image_path = i
+                        break
+                except:
+                    if text_file.split('/')[-1].split('.')[0] == i.split('/')[-1].split('.')[0]:
+                        image_path = i
+                        break
             y_size, x_size, _ = np.array(Image.open(image_path)).shape
             file = open(text_file,'r')
             
             lines = file.readlines()
             for line in lines:
                 line = line.split()
-                image_name.append(image_file_name)
+                image_name.append(image_path)
                 xmin.append(float(line[1])*x_size)
                 ymin.append(float(line[2])*y_size)
                 xmax.append(float(line[3])*x_size)

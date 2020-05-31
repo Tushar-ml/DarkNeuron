@@ -7,10 +7,10 @@ containing Image_Annotation, Training and Prediction
 Author: Tushar Goel
 
 """
-
+import os
 from Yolo_Format import Image_Annotation
 from Download_Convert_Yolo_Weights import Download_weights,Convert_weights
-
+from Model_Training import Train_Yolo
 class YOLOv3:
     """
     This Class Will provide full implementation of YOLOv3 
@@ -75,22 +75,27 @@ class YOLOv3:
             df = Image_Annot.csv_from_text(class_list_file_name = class_file_name)
             Image_Annot.Convert_to_Yolo_Format(df=df)
             
-    def Train_the_Yolo(self,yolo_file_name=None,plot_model=False,save_weights=False):
+    def Train_the_Yolo(self,plot_model=False,save_weights=False,
+                       epochs = 51, batch_size1 = 32,batch_size2 = 4,
+                       validation_split = 0.1, is_tiny = False, random_seed = None):
         
-        self.yolo_file_name = yolo_file_name
+        yolo_file_path = os.path.join(self.working_directory,'yolo.h5')
         #Checking whether User have Yolo File or Not 
         #If no File, then it will be downloaded Automatically and Converted to Keras Model
-        if yolo_file_name is None:
+        if not os.path.exists(yolo_file_path):
             Download_weights(self.working_directory)
             Convert_weights(self.working_directory,plot_model=plot_model,save_weights=save_weights)
-            
+            yolo_file_path = os.path.join(self.working_directory,'yolo.h5')
         
+        print('Model Training to be Start ....')
+        history = Train_Yolo(working_directory = self.working_directory,val_split = validation_split,
+                   is_tiny = is_tiny,random_seed = random_seed,epochs=epochs,batch_size1 = batch_size1,
+                   batch_size2 = batch_size2)
+        
+        
+        self.history = history
     
-    
-working_directory = r'C:\Users\Tushar Goel\Desktop\OpenLabeling-master\images'
-yolo = YOLOv3(working_directory=working_directory)
-yolo.Prepare_the_Data(file_type='text',class_file_name='class_list.txt')
-yolo.Train_the_Yolo()            
+       
         
         
 
