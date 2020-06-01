@@ -123,8 +123,8 @@ class Image_Annotation:
     
     def csv_from_xml(self, path_name=""):
         # First get all images and xml files from path and its subfolders
-        image_paths = self.GetFileList(self.working_directory, ".jpg")
-        xml_paths = self.GetFileList(self.working_directory, ".xml")
+        image_paths = GetFileList(self.working_directory, ".jpg")
+        xml_paths = GetFileList(self.working_directory, ".xml")
         result_df = pd.DataFrame()
         if not len(image_paths) == len(xml_paths):
             print("number of annotations doesnt match number of images")
@@ -165,7 +165,7 @@ class Image_Annotation:
     def csv_from_text(self,class_list_file_name):
         
         text_file_paths = glob(os.path.join(self.working_directory,'*.txt'))
-        image_file_paths = self.GetFileList(self.working_directory,['.jpg','.jpeg','.png'])
+        image_file_paths = GetFileList(self.working_directory,['.jpg','.jpeg','.png'])
         #Removing Class_text file from text path:
         
         class_file_text = os.path.join(self.working_directory,class_list_file_name)
@@ -221,7 +221,9 @@ class Image_Annotation:
 
         return df
         
-    def GetFileList(self,dirName, endings=[".jpg", ".jpeg", ".png", ".mp4"]):
+    
+    
+def GetFileList(dirName, endings=[".jpg", ".jpeg", ".png", ".mp4"]):
         # create a list of file and sub directories
         # names in the given directory
         listOfFile = os.listdir(dirName)
@@ -237,7 +239,7 @@ class Image_Annotation:
             fullPath = os.path.join(dirName, entry)
             # If entry is a directory then get the list of files in this directory
             if os.path.isdir(fullPath):
-                allFiles = allFiles + self.GetFileList(fullPath, endings)
+                allFiles = allFiles + GetFileList(fullPath, endings)
             else:
                 for ending in endings:
                     if entry.endswith(ending):
