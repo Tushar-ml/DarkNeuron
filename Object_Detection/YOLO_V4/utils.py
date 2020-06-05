@@ -14,7 +14,7 @@ from timeit import default_timer as timer
 min_logo_size = (10, 10)
 
 
-def detect_object(yolo, img_path, save_img, save_img_path="./", postfix=""):
+def detect_object(yolo, img_path, save_img,classes = [],score = 0.5, save_img_path="./", postfix=""):
     """
     Call YOLO logo detector on input image, optionally save resulting image.
 
@@ -37,7 +37,7 @@ def detect_object(yolo, img_path, save_img, save_img_path="./", postfix=""):
         print("File Open Error! Try again!")
         return None, None
 
-    prediction, new_image = yolo.detect_image(image)
+    prediction, new_image = yolo.detect_image(image,classes = classes,score=score)
 
     img_out = postfix.join(os.path.splitext(os.path.basename(img_path)))
     if save_img:

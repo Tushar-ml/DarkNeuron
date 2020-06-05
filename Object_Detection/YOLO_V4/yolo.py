@@ -130,7 +130,7 @@ class YOLO:
         )
         return boxes, scores, classes
 
-    def detect_image(self, image,show_stats=True):
+    def detect_image(self, image,classes = [],score = 0.5,show_stats=True):
         start = timer()
         # self.sess.run(tf.compat.v1.global_variables_initializer())
         if self.model_image_size != (None, None):
@@ -167,11 +167,24 @@ class YOLO:
             font=font_path, size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32")
         )
         thickness = (image.size[0] + image.size[1]) // 300
-
+        if type(classes) is not list:
+            raise SyntaxError('Provide the Classes as List')
+            
+            
         for i, c in reversed(list(enumerate(out_classes))):
-            predicted_class = self.class_names[c]
+            if (len(classes) != 0):
+                if self.class_names[c] in classes:
+                    predicted_class = self.class_names[c]
+                else:
+                    continue
+            else:
+                predicted_class = self.class_names[c]
             box = out_boxes[i]
-            score = out_scores[i]
+            if out_scores[i]>score:
+                score = out_scores[i]
+                
+            else:
+                continue
 
             label = "{} {:.2f}".format(predicted_class, score)
             draw = ImageDraw.Draw(image)
@@ -222,7 +235,7 @@ class YOLO:
     def close_session(self):
         self.sess.close()
 
-def detect_video(yolo, video_path, output_path=""):
+def detect_video(yolo, video_path, classes = [],score = 0.5,output_path=""):
     import cv2
     vid = cv2.VideoCapture(video_path)
     if not vid.isOpened():
@@ -242,7 +255,7 @@ def detect_video(yolo, video_path, output_path=""):
     while True:
         return_value, frame = vid.read()
         image = Image.fromarray(frame)
-        prediction,image = yolo.detect_image(image,show_stats=False)
+        prediction,image = yolo.detect_image(image,classes=classes,score=score,show_stats=False)
         result = np.asarray(image)
         curr_time = timer()
         exec_time = curr_time - prev_time

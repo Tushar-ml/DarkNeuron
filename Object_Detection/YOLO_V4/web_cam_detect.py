@@ -1,11 +1,11 @@
-from PIL import ImageGrab,Image
+from PIL import Image
 import numpy as np
 import cv2
 from .yolo import YOLO
 import os 
 
 
-def Web_Cam_Detection(working_directory,videopath=0,model_name=None,score = 0.6,iou = 0.5,gpu_num = 1):
+def Web_Cam_Detection(working_directory,videopath=0,model_name=None,classes = [],score = 0.6,iou = 0.5,gpu_num = 1):
     
     anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
     if model_name is None:
@@ -32,7 +32,7 @@ def Web_Cam_Detection(working_directory,videopath=0,model_name=None,score = 0.6,
         ret,frame = cap.read()
         
         img = Image.fromarray(frame)
-        pred,image = yolo.detect_image(img)
+        pred,image = yolo.detect_image(img,classes = classes,score=score)
         
         image = np.array(image)
         out.write(image)

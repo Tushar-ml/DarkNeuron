@@ -14,6 +14,8 @@ from .Download_Convert_Yolo_Weights import Yolo4_weights,Download_weights
 from .Model_Training import Train_Yolo
 from .Detection import Detector
 from .web_cam_detect import Web_Cam_Detection
+from .deep_sort_tracking import DeepSort_Tracking
+from .yolo_tracking import YOLO_Tracker
 import matplotlib.pyplot as plt
 
 class YOLOv4:
@@ -118,14 +120,31 @@ class YOLOv4:
         plt.legends()
         plt.show()
         
-    def Detect(self,test_folder_name='test',model_name = None,web_cam = False,real_time = False,videopath = 0,tracking =False,classes = None,score=0.5,gpu_num = 1):
+    def Detect(self,test_folder_name='test',model_name = None,cam = False,real_time = False,videopath = 0,classes = [],tracking =False,score=0.5,gpu_num = 1):
         
+        if model_name is None:
+            model_path = os.path.join(self.working_directory,'yolov4.h5')
+            print('Yolo File Not Found...Downloading and Converting...')
+            if not os.path.exists(model_path):
+                Download_weights(working_directory = self.working_directory)
+                yolov4 = Yolo4_weights(score=score,anchors_path = self.anchors_path,classes_path = self.coco_class,
+                                   model_path = model_path,weights_path = self.weight_path,gpu_num = gpu_num)
+                yolov4.load_yolo()
+        
+        yolo_tracker = YOLO_Tracker(working_directory = self.working_directory,model_name=model_name,
+                                    score = score,classes = classes)
         if real_time:
-            Real_Time_Tracking(working_directory = self.working_directory)
+            Real_Time_Tracking(working_directory = self.working_directory,classes = classes,score = score)
         
-        elif web_cam:
+        elif cam:
+
             Web_Cam_Detection(working_directory = self.working_directory,videopath = videopath,model_name=model_name,score=score,
-                              gpu_num = gpu_num)
+                              gpu_num = gpu_num,classes = classes)
+            
+        elif tracking :
+                
+            DeepSort_Tracking(working_directory = self.working_directory,yolo = yolo_tracker,file_path = videopath)
+        
         else:
             Detector(working_directory = self.working_directory,test_folder_name = test_folder_name,
                      classes = classes,score = score,model_name = model_name,gpu_num = gpu_num)

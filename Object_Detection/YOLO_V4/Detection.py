@@ -19,7 +19,7 @@ from .Yolo_Format import GetFileList
 import random
 
 
-def Detector(working_directory,test_folder_name,model_name=None,classes=None,score=0.5,gpu_num = 1):
+def Detector(working_directory,test_folder_name,classes = [],model_name=None,score=0.5,gpu_num = 1):
     """
     This Function will be used for Detection of Objects in Video Or Images
     

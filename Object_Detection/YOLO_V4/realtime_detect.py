@@ -7,7 +7,7 @@ import pyautogui
 
 width,height = pyautogui.size()[0],pyautogui.size()[1]
 
-def Real_Time_Tracking(working_directory,model_name=None,score = 0.6,iou = 0.5,gpu_num = 1):
+def Real_Time_Tracking(working_directory,classes = [],model_name=None,score = 0.6,iou = 0.5,gpu_num = 1):
     
     anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
     if model_name is None:
@@ -32,7 +32,7 @@ def Real_Time_Tracking(working_directory,model_name=None,score = 0.6,iou = 0.5,g
         # make a screenshot
         img = pyautogui.screenshot()
         # convert these pixels to a proper numpy array to work with OpenCV
-        prediction,img = yolo.detect_image(img,show_stats=False)
+        prediction,img = yolo.detect_image(img,classes = classes,score = score,show_stats=False)
         frame = np.array(img)
         # convert colors from BGR to RGB
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
