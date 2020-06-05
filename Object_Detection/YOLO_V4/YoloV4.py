@@ -40,7 +40,9 @@ class YOLOv4:
         
         # Creating Attribute Working Directory
         self.working_directory = working_directory
-        
+        print('\t\t###########################\n')
+        print('\t\tWelcome To The DARK NEURON\n')
+        print('\t\t###########################\n')
     
     def Prepare_the_Data(self,file_type,dataframe_name=None,class_file_name=None):
         """
@@ -60,7 +62,7 @@ class YOLOv4:
             data_classes.txt --> Classes of the Data
             
         """
-            
+        print('\n\t\t---------Preparing Data Phase-----------')   
         self.file_type = file_type
         # Method Involves 'csv','xml','text'
         Image_Annot = Image_Annotation(working_directory = self.working_directory,dataframe_name=dataframe_name)
@@ -91,6 +93,9 @@ class YOLOv4:
                        epochs1 = 51,epochs2 = 50, batch_size1 = 32,batch_size2 = 4,gpu_num = 1,
                        validation_split = 0.1,process1 = True,process2 = True):
         
+        
+        print('\n\t\t------------Training Phase Generated---------')
+        
         yolo_file_path = os.path.join(self.working_directory,'yolov4.h5')
         self.class_path = os.path.join(self.working_directory,'class_list.txt')
         self.anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
@@ -113,6 +118,7 @@ class YOLOv4:
         
         
         self.history = history
+        print('\n\t\t----------Visualisation of Metrics-------------')
         
         plt.plot(self.history.history['loss'],label = 'Training Loss')
         plt.plot(self.history.history['val_loss'],label = 'Validation Loss')
@@ -132,7 +138,10 @@ class YOLOv4:
                 yolov4.load_yolo()
         
         yolo_tracker = YOLO_Tracker(working_directory = self.working_directory,model_name=model_name,
-                                    score = score,classes = classes)
+                                   score = score,classes = classes)
+        
+        print('\n\t\t-------------Detection Phase Generated-------------')
+        
         if real_time:
             Real_Time_Tracking(working_directory = self.working_directory,classes = classes,score = score)
         

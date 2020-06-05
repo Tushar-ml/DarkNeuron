@@ -13,7 +13,7 @@ Different Architectures:
     --> Resnet50
 
 """
-from .Deep_Stack_CNN import Deep_Stack
+from .Dark_Neuron_CNN import Dark_Neuron
 import  tensorflow as tf            # Powerful Framework for Deep Learning
 import os                           # For Searching Folder within the system
 from .models import Create_Model, Train_Model           # Script containing Different Models
