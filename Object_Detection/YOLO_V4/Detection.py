@@ -9,15 +9,13 @@ Author: Tushar Goel
 
 import os
 import sys
-from yolo import YOLO,detect_video
+from .yolo import YOLO,detect_video
 from PIL import Image
 from timeit import default_timer as timer
-from utils import load_extractor_model, load_features, parse_input, detect_object
-import test
-import utils
+from .utils import load_extractor_model, load_features, parse_input, detect_object
 import pandas as pd
 import numpy as np
-from Yolo_Format import GetFileList
+from .Yolo_Format import GetFileList
 import random
 
 
@@ -38,12 +36,12 @@ def Detector(working_directory,test_folder_name,model_name=None,classes=None,sco
 
     if model_name is None:
         model_weights = os.path.join(working_directory,'yolov4.h5')
-        model_classes = 'model_data/coco_classes.txt'
+        model_classes = os.path.join(os.path.dirname(__file__),'model_data/coco_classes.txt')
     else:
         model_weights = os.path.join(working_directory,model_name)
         model_classes = os.path.join(working_directory,'data_classes.txt')
     
-    anchors_path = 'yolo4_anchors.txt'
+    anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
     detection_results_file = os.path.join(working_directory,'Detections_results.csv')
     postfix = 'Detection'
     save_img = True

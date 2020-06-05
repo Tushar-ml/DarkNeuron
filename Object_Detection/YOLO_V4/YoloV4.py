@@ -8,10 +8,13 @@ Author: Tushar Goel
 
 """
 import os
-from Yolo_Format import Image_Annotation
-from Download_Convert_Yolo_Weights import Yolo4_weights,Download_weights
-from Model_Training import Train_Yolo
-from Detection import Detector
+from .realtime_detect import Real_Time_Tracking
+from .Yolo_Format import Image_Annotation
+from .Download_Convert_Yolo_Weights import Yolo4_weights,Download_weights
+from .Model_Training import Train_Yolo
+from .Detection import Detector
+from .web_cam_detect import Web_Cam_Detection
+import matplotlib.pyplot as plt
 
 class YOLOv4:
     """
@@ -57,60 +60,76 @@ class YOLOv4:
         """
             
         self.file_type = file_type
-        # Method Involves 'dataframe','xml','text'
+        # Method Involves 'csv','xml','text'
         Image_Annot = Image_Annotation(working_directory = self.working_directory,dataframe_name=dataframe_name)
-        if self.file_type not in ['dataframe','xml','text']:
+        if self.file_type not in ['csv','xml','text']:
             raise ValueError('Method either should be dataframe,xml,text')
             
-        if self.file_type == 'dataframe':
-            
+        if self.file_type == 'csv':
+            print("Generating Data......")
             Image_Annot.Convert_to_Yolo_Format()
             
         elif self.file_type == 'xml':
-            
-            df = Image_Annot.csv_from_xml()
+            print("Generating Data......")
+            print('Generating txt files from xml')
+            Image_Annot.csv_from_xml(class_list_file_name = class_file_name)
+            print('Generated')
+            df = Image_Annot.csv_from_text(class_list_file_name = class_file_name)
+           
             Image_Annot.Convert_to_Yolo_Format(df=df)
 
         elif self.file_type == 'text':
             if class_file_name is None:
                 raise ValueError('Provide Class File Name for method text')
+            print("Generating Data......")
             df = Image_Annot.csv_from_text(class_list_file_name = class_file_name)
             Image_Annot.Convert_to_Yolo_Format(df=df)
             
-    def Train_the_Yolo(self,plot_model=False,save_weights=False,score = 0.5,iou = 0.5,
+    def Train_the_Yolo(self,model_name = 'yolov4.h5',input_shape = (608,608),plot_model=False,save_weights=False,score = 0.5,iou = 0.5,
                        epochs1 = 51,epochs2 = 50, batch_size1 = 32,batch_size2 = 4,gpu_num = 1,
-                       validation_split = 0.1):
+                       validation_split = 0.1,process1 = True,process2 = True):
         
         yolo_file_path = os.path.join(self.working_directory,'yolov4.h5')
         self.class_path = os.path.join(self.working_directory,'class_list.txt')
-        self.anchors_path = 'yolo4_anchors.txt'
+        self.anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
         self.weight_path = os.path.join(self.working_directory,'yolov4.weights')
+        self.coco_class = os.path.join(os.path.dirname(__file__),'model_data/coco_classes.txt')
         #Checking whether User have Yolo File or Not 
         #If no File, then it will be downloaded Automatically and Converted to Keras Model
         if not os.path.exists(yolo_file_path):
             
             Download_weights(working_directory = self.working_directory)
-            yolov4 = Yolo4_weights(score=score,iou=iou,anchors_path = self.anchors_path,classes_path = self.class_path,
+            yolov4 = Yolo4_weights(score=score,iou=iou,anchors_path = self.anchors_path,classes_path = self.coco_class,
                                    model_path = yolo_file_path,weights_path = self.weight_path,gpu_num = gpu_num)
             yolov4.load_yolo()
 
         
         print('Model Training to be Start ....')
-        history = Train_Yolo(working_directory = self.working_directory,val_split = validation_split,
+        history = Train_Yolo(working_directory = self.working_directory,model_name = model_name,val_split = validation_split,
                    epochs1=epochs1,epochs2 = epochs2,batch_size1 = batch_size1,
-                   batch_size2 = batch_size2)
+                   batch_size2 = batch_size2,process1 = process1, process2 = process2)
         
         
         self.history = history
         
-    def Detect(self,test_folder_name,model_name = None,real_time = False,tracking = None,classes = None,score=0.5,gpu_num = 1):
+        plt.plot(self.history.history['loss'],label = 'Training Loss')
+        plt.plot(self.history.history['val_loss'],label = 'Validation Loss')
+        plt.title('Training Loss vs Validation Loss')
+        plt.legends()
+        plt.show()
         
-        Detector(working_directory = self.working_directory,test_folder_name = test_folder_name,
-                 classes = classes,score = score,model_name = model_name,gpu_num = gpu_num)
+    def Detect(self,test_folder_name='test',model_name = None,web_cam = False,real_time = False,videopath = 0,tracking =False,classes = None,score=0.5,gpu_num = 1):
+        
+        if real_time:
+            Real_Time_Tracking(working_directory = self.working_directory)
+        
+        elif web_cam:
+            Web_Cam_Detection(working_directory = self.working_directory,videopath = videopath,model_name=model_name,score=score,
+                              gpu_num = gpu_num)
+        else:
+            Detector(working_directory = self.working_directory,test_folder_name = test_folder_name,
+                     classes = classes,score = score,model_name = model_name,gpu_num = gpu_num)
+            
     
-working_directory = r'C:\Users\TusharGoel\Desktop\OpenLabeling-master\images'       
-yolo = YOLOv4(working_directory)
-#yolo.Prepare_the_Data(file_type='text',class_file_name = 'class_list.txt')
-#yolo.Train_the_Yolo(epochs1 = 3,epochs2 = 1,batch_size1 = 1,batch_size2 = 2)      
-yolo.Detect(test_folder_name = 'test_folder',model_name = 'logstrained_weights_final.h5',score=0.1)       
+       
 

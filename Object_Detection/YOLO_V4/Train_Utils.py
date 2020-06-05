@@ -19,13 +19,13 @@ from keras.callbacks import (
     ReduceLROnPlateau,
     EarlyStopping,
 )
-from yolo3.model import (
+from .yolo3.model import (
     preprocess_true_boxes,
     yolo_body,
     tiny_yolo_body,
     yolo_loss,
 )
-from yolo3.utils import get_random_data
+from .yolo3.utils import get_random_data
 from PIL import Image
 
 

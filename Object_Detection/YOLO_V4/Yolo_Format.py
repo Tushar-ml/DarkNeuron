@@ -10,12 +10,14 @@ from it.
 Author : Tushar Goel
 
 """
+import cv2
 from PIL import Image
 import os
 import re
 import pandas as pd
 import numpy as np
 from glob import glob
+from .voc_to_yolo import convert_annotation, getImagesInDir
 
 class Image_Annotation:
     """
@@ -121,47 +123,25 @@ class Image_Annotation:
         file.close()
         return True
     
-    def csv_from_xml(self, path_name=""):
-        # First get all images and xml files from path and its subfolders
-        image_paths = GetFileList(self.working_directory, ".jpg")
-        xml_paths = GetFileList(self.working_directory, ".xml")
-        result_df = pd.DataFrame()
-        if not len(image_paths) == len(xml_paths):
-            print("number of annotations doesnt match number of images")
-            return False
-        for image in image_paths:
-            target_filename = os.path.join(path_name, image) if path_name else image
-            source_filename = os.path.join(self.working_directory, image)
-            y_size, x_size, _ = np.array(Image.open(source_filename)).shape
-            source_xml = image.replace(".jpg", ".xml")
-            txt = open(source_xml, "r").read()
-            y_vals = re.findall(r"(?:x>\n)(.*)(?:\n</)", txt)
-            ymin_vals = y_vals[::2]
-            ymax_vals = y_vals[1::2]
-            x_vals = re.findall(r"(?:y>\n)(.*)(?:\n</)", txt)
-            xmin_vals = x_vals[::2]
-            xmax_vals = x_vals[1::2]
-            label_vals = re.findall(r"(?:label>\n)(.*)(?:\n</)", txt)
-            label_name_vals = re.findall(r"(?:labelname>\n)(.*)(?:\n</)", txt)
-            df = pd.DataFrame()
-            df["xmin"] = xmin_vals
-            df["xmin"] = df["xmin"].astype(float) * x_size
-            df["ymin"] = ymin_vals
-            df["ymin"] = df["ymin"].astype(float) * y_size
-            df["xmax"] = xmax_vals
-            df["xmax"] = df["xmax"].astype(float) * x_size
-            df["ymax"] = ymax_vals
-            df["ymax"] = df["ymax"].astype(float) * y_size
-            df["label"] = label_name_vals
-            df["code"] = label_vals
-            df["image_path"] = target_filename
-            df["image"] = os.path.basename(target_filename)
-            result_df = result_df.append(df)
-        #     Bring image column first
-        cols = list(df.columns)
-        cols = [cols[-1]] + cols[:-1]
-        result_df = result_df[cols]
-        return result_df
+    def csv_from_xml(self,class_list_file_name):
+        output_path = self.working_directory
+        class_file_text = os.path.join(self.working_directory,class_list_file_name)
+        class_file = open(class_file_text,'r')
+        classes = class_file.readlines()
+
+        class_list = []
+        for cla in classes:
+            cla = cla.split()[0]
+            class_list.append(cla.lower())
+            
+        class_list = sorted(class_list)
+        image_paths = getImagesInDir(output_path)
+        list_file = open(output_path + '.txt', 'w')
+        for image_path in image_paths:
+            list_file.write(image_path + '\n')
+            convert_annotation(output_path, output_path, image_path,class_list)
+        list_file.close()
+        
     def csv_from_text(self,class_list_file_name):
         
         text_file_paths = glob(os.path.join(self.working_directory,'*.txt'))
@@ -176,7 +156,13 @@ class Image_Annotation:
         classes = class_file.readlines()
         class_dic = dict()
         count = 0
+        class_list = []
         for cla in classes:
+            cla = cla.split()[0]
+            class_list.append(cla)
+            
+        class_list = sorted(class_list)
+        for cla in class_list:
             cla = cla.split()[0]
             class_dic[count] = cla
             count += 1
@@ -198,17 +184,19 @@ class Image_Annotation:
                     if text_file.split('/')[-1].split('.')[0] == i.split('/')[-1].split('.')[0]:
                         image_path = i
                         break
-            y_size, x_size, _ = np.array(Image.open(image_path)).shape
+            #y_size, x_size = np.array(Image.open(image_path)).shape
             file = open(text_file,'r')
-            
+            img = cv2.imread(image_path)
+            w = img.shape[1]
+            h = img.shape[0]
             lines = file.readlines()
             for line in lines:
                 line = line.split()
                 image_name.append(image_path)
-                xmin.append(float(line[1])*x_size)
-                ymin.append(float(line[2])*y_size)
-                xmax.append(float(line[3])*x_size)
-                ymax.append(float(line[4])*y_size)
+                xmin.append(float(line[1])*w)
+                ymin.append(float(line[2])*h)
+                xmax.append(float(line[3])*w)
+                ymax.append(float(line[4])*h)
                 
                 label.append(class_dic[int(line[0])])
                 
@@ -229,10 +217,10 @@ def GetFileList(dirName, endings=[".jpg", ".jpeg", ".png", ".mp4"]):
         listOfFile = os.listdir(dirName)
         allFiles = list()
         # Make sure all file endings start with a '.'
-    
+        endings_final = [0]*len(endings)
         for i, ending in enumerate(endings):
             if ending[0] != ".":
-                endings[i] = "." + ending
+                endings_final[i] = "." + ending
         # Iterate over all the entries
         for entry in listOfFile:
             # Create full path

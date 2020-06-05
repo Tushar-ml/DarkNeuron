@@ -21,22 +21,23 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 import os
-from yolo4.model import preprocess_true_boxes, yolo4_body, yolo4_loss
-from yolo4.utils import get_random_data
+from .yolo4.model import preprocess_true_boxes, yolo4_body, yolo4_loss
+from .yolo4.utils import get_random_data
 
 
-def Train_Yolo(working_directory,val_split = 0.1,batch_size1 = 32,batch_size2 = 4,epochs1 = 51,epochs2 = 30):
+def Train_Yolo(working_directory,model_name = 'yolov4.h5',input_shape = (608,608),val_split = 0.1,batch_size1 = 32,batch_size2 = 4,epochs1 = 51,epochs2 = 30,
+               process1 = True,process2 = True):
     annotation_path = os.path.join(working_directory,'data_train.txt')
     log_dir = os.path.join(working_directory,'logs')
     if not os.path.exists(log_dir):
         os.mkdir(log_dir)
     classes_path = os.path.join(working_directory,'data_classes.txt')
-    anchors_path = 'yolo4_anchors.txt'
+    anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
     class_names = get_classes(classes_path)
     num_classes = len(class_names)
     anchors = get_anchors(anchors_path)
-    weights_path = os.path.join(working_directory,'yolov4.h5')
-    input_shape = (608,608) # multiple of 32, hw
+    weights_path = os.path.join(working_directory,model_name)
+    input_shape = input_shape # multiple of 32, hw
 
     model = create_model(input_shape, anchors, num_classes,
         freeze_body=2, weights_path=weights_path) # make sure you know what you freeze
@@ -47,7 +48,7 @@ def Train_Yolo(working_directory,val_split = 0.1,batch_size1 = 32,batch_size2 = 
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3, verbose=1)
     early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=1)
 
-    val_split = 0.1
+    val_split = val_split
     with open(annotation_path) as f:
         lines = f.readlines()
     np.random.seed(10101)
@@ -58,7 +59,7 @@ def Train_Yolo(working_directory,val_split = 0.1,batch_size1 = 32,batch_size2 = 
 
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
-    if True:
+    if process1:
         model.compile(optimizer=Adam(lr=1e-3), loss={
             # use custom yolo4_loss Lambda layer.
             'yolo_loss': lambda y_true, y_pred: y_pred})
@@ -76,7 +77,7 @@ def Train_Yolo(working_directory,val_split = 0.1,batch_size1 = 32,batch_size2 = 
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
-    if True:
+    if process2:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
         model.compile(optimizer=Adam(lr=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change

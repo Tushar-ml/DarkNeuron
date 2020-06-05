@@ -14,8 +14,8 @@ from keras import backend as K
 from keras.models import load_model
 from keras.layers import Input
 from keras.utils import multi_gpu_model
-from yolo4.model import yolo_eval, yolo4_body
-from yolo4.utils import letterbox_image
+from .yolo4.model import yolo_eval, yolo4_body
+from .yolo4.utils import letterbox_image
 import wget
 from PIL import Image, ImageFont, ImageDraw
 from timeit import default_timer as timer
