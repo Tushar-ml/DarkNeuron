@@ -6,11 +6,11 @@ import cv2
 import numpy as np
 from PIL import Image
 import os
-from .deep_sort import preprocessing
-from .deep_sort import nn_matching
+from .deep_preprocessing import *
+import nn_matching
 from .deep_sort.detection import Detection
 from .deep_sort.tracker import Tracker
-from .tools import generate_detections as gdet
+from  .generate_detections import *
 import imutils.video
 
 
@@ -26,7 +26,7 @@ def DeepSort_Tracking(yolo,working_directory,file_path = 0):
     # Deep SORT
     model_filename = os.path.join(os.path.dirname(__file__),'model_data/mars-small128.pb')
     print('Deep Sort Model Generated')
-    encoder = gdet.create_box_encoder(model_filename,batch_size=1)
+    encoder = create_box_encoder(model_filename,batch_size=1)
     
     metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
     tracker = Tracker(metric)
@@ -67,7 +67,7 @@ def DeepSort_Tracking(yolo,working_directory,file_path = 0):
         # Run non-maxima suppression.
         boxes = np.array([d.tlwh for d in detections])
         scores = np.array([d.confidence for d in detections])
-        indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+        indices = non_max_suppression(boxes, nms_max_overlap, scores)
         detections = [detections[i] for i in indices]
         
         # Call the tracker

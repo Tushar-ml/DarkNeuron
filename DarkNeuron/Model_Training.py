@@ -21,8 +21,8 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 import os
-from .yolo4.model import preprocess_true_boxes, yolo4_body, yolo4_loss
-from .yolo4.utils import get_random_data
+from .yolo4_model import preprocess_true_boxes, yolo4_body, yolo4_loss
+from .yolo4_utils import get_random_data
 
 
 def Train_Yolo(working_directory,model_name = 'yolov4.h5',input_shape = (608,608),val_split = 0.1,batch_size1 = 32,batch_size2 = 4,epochs1 = 51,epochs2 = 30,

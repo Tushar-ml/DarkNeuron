@@ -10,7 +10,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.models import Model
 from keras.regularizers import l2
 
-from .utils import compose
+from .yolo_utils import compose
 
 class Mish(Layer):
     '''
