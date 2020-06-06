@@ -1,6 +1,6 @@
 """
 
-This File will contain the implementation of YOLOV3 Algorithm,
+This File will contain the implementation of YOLOV4 Algorithm,
 
 containing Image_Annotation, Training and Prediction
 
