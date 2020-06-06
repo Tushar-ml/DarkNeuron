@@ -10,8 +10,7 @@ setup(
   packages = ['DarkNeuron'],  
   version = '1.2.1',    
   long_description=readme(),
-  long_description_content_type="text/markdown",  
-  version = '1.2',      
+  long_description_content_type="text/markdown",       
 
   license='MIT',       
   description = 'A Library for Easy Implementation of Deep learning Techniques',   
