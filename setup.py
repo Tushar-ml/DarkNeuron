@@ -9,16 +9,22 @@ setup(
   name = 'DarkNeuron',         
   packages = ['DarkNeuron'],  
 
+
   version = '1.2.3',    
   long_description=readme(),
   long_description_content_type="text/markdown",  
    
+   
+  long_description=readme(),
+  long_description_content_type="text/markdown",       
+
 
   license='MIT',       
   description = 'A Library for Easy Implementation of Deep learning Techniques',   
   author = 'Tushar Goel',
   author_email = 'tgoel219@gmail.com',     
   url = 'https://github.com/Tushar-ml/DarkNeuron',   
+
 
   download_url = 'https://github.com/Tushar-ml/DarkNeuron/archive/v1.2.3.tar.gz',    
     
