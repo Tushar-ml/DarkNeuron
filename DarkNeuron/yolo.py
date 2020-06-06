@@ -13,8 +13,8 @@ from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
 
-from .yolo4.model import yolo_eval, yolo4_body,tiny_yolo_body
-from .yolo4.utils import letterbox_image
+from .yolo4_model import yolo_eval, yolo4_body,tiny_yolo_body
+from .yolo4_utils import letterbox_image
 from keras.utils import multi_gpu_model
 
 class YOLO:

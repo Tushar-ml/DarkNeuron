@@ -1,9 +1,0 @@
-Changes to be made in Deep Stack classification Model:
-
-	--> User can retrain its own model.
-Done-->	--> Model Function API to Sequential APi (kaggle transfer learning resnet50 notebook) for training_model	
-	--> To Generalize the Prediction Model
-	--> predict_generator(for predicting in directorries)
-	--> Prediction To Classes Function and Dictionary to Classes
-	--> To Clear the Understanding of Output Consolre (How the ouput is going to look)
-	--> Teach me Function

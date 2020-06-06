@@ -12,7 +12,7 @@ setup(
   keywords = ['Keras','Object_Detection','CNN'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
           'wget','tensorflow == 1.15.0','numpy == 1.18.4','scipy == 1.4.1','matplotlib == 3.2.1',
-          'keras == 2.1.4', 'pandas==0.23.0','PyAutoGUI==0.9.48','cv2==4.2.0','Pillow==5.3.0'
+          'keras == 2.1.4', 'pandas==0.23.0','PyAutoGUI==0.9.48','opencv-python==4.2.0.32','Pillow==5.3.0'
       ],
   classifiers=[
     'Development Status :: 5',
@@ -22,3 +22,4 @@ setup(
     'Programming Language :: Python :: 3.6',
   ],
 )
+
