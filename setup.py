@@ -6,11 +6,11 @@ def readme():
     return README
 
 setup(
-  name = 'DarkNeuron',         
-  packages = ['DarkNeuron'],  
+  name = 'DarkNeurons',         
+  packages = ['DarkNeurons'],  
 
 
-  version = '1.2.7',    
+  version = '1.2.8',    
   long_description=readme(),
   long_description_content_type="text/markdown",     
 
@@ -22,7 +22,7 @@ setup(
   url = 'https://github.com/Tushar-ml/DarkNeuron',   
 
 
-  download_url = 'https://github.com/Tushar-ml/DarkNeuron/archive/v1.2.7.tar.gz',    
+  download_url = 'https://github.com/Tushar-ml/DarkNeuron/archive/v1.2.8.tar.gz',    
     
   keywords = ['Keras','Object_Detection','CNN'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
