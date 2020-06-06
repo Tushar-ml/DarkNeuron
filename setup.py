@@ -10,13 +10,9 @@ setup(
   packages = ['DarkNeuron'],  
 
 
-  version = '1.2.3',    
+  version = '1.2.4',    
   long_description=readme(),
-  long_description_content_type="text/markdown",  
-   
-   
-  long_description=readme(),
-  long_description_content_type="text/markdown",       
+  long_description_content_type="text/markdown",     
 
 
   license='MIT',       
@@ -26,7 +22,7 @@ setup(
   url = 'https://github.com/Tushar-ml/DarkNeuron',   
 
 
-  download_url = 'https://github.com/Tushar-ml/DarkNeuron/archive/v1.2.3.tar.gz',    
+  download_url = 'https://github.com/Tushar-ml/DarkNeuron/archive/v1.2.4.tar.gz',    
     
   keywords = ['Keras','Object_Detection','CNN'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
