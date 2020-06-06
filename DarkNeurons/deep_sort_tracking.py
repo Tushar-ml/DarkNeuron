@@ -6,10 +6,10 @@ import cv2
 import numpy as np
 from PIL import Image
 import os
-from .deep_preprocessing import *
+from .deepsort_preprocessing import *
 import nn_matching
-from .deep_sort.detection import Detection
-from .deep_sort.tracker import Tracker
+from .deepsort_detection import Detection
+from .tracker import Tracker
 from  .generate_detections import *
 import imutils.video
 
