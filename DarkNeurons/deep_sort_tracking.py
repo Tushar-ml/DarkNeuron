@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 import os
 from .deepsort_preprocessing import *
-import nn_matching
+from .nn_matching import *
 from .deepsort_detection import Detection
 from .tracker import Tracker
 from  .generate_detections import *
@@ -28,7 +28,7 @@ def DeepSort_Tracking(yolo,working_directory,file_path = 0):
     print('Deep Sort Model Generated')
     encoder = create_box_encoder(model_filename,batch_size=1)
     
-    metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
+    metric = NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
     tracker = Tracker(metric)
 
     writeVideo_flag = True
