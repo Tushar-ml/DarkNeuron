@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'DarkNeuron',         
   packages = ['DarkNeuron'],  
-  version = '1.1',      
+  version = '1.2',      
   license='MIT',       
   description = 'A Library for Easy Implementation of Deep learning Techniques',   
   author = 'Tushar Goel',
