@@ -200,7 +200,7 @@ This Feature will be used for Model Training purposes .
 <h3 id='class_prediction'> Prediction </h3>
 This Feature will be used for Prediction from the model on the Test Dataset.
 <br><b>To do this step, First Prepare the Data with train argument set to False and obtain test object from it.</b>
-<br><br><b>Code Syntax:
+<br><br><b>Code Syntax:</b>
 
     classify.Predict_from_the_Model(labels = labels,
 					model = model,
