@@ -30,7 +30,7 @@
 # Installation 
 		
 
-    pip install DarkNeuron
+    pip install DarkNeurons
 
 
 ## DarkNeuron Target Audience:
