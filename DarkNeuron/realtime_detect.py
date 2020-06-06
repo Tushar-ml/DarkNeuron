@@ -1,4 +1,4 @@
-from PIL import ImageGrab,Image
+from PIL import Image
 import numpy as np
 import cv2
 from .yolo import YOLO
