@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 class YOLOv4:
     """
-    This Class Will provide full implementation of YOLOv3 
+    This Class Will provide full implementation of YOLOv4 
     
     within simple steps.
     
@@ -32,7 +32,7 @@ class YOLOv4:
         
         Train_the_Yolo --> This Will Train the YOLOv3 For Users with no additional arguments
         
-        Predict_from_Yolo --> It will help in Detection of objects whether it is Image or Video.
+        Detect --> It will help in Detection of objects whether it is Image or Video.
         
     """
     

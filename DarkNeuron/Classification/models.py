@@ -275,7 +275,7 @@ def Train_Model(model,num_classes,train_data_object,working_directory,output_dir
     if callbacks:
         my_callbacks = callbacks
         
-        New_Model.compile(loss = loss,optimizer = optimizer,metrics = [metrics])
+        New_Model.compile(loss = loss,optimizer = optimizer,metrics = metrics)
         if validation_data_object is None:
             
             history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs= epochs, callbacks = my_callbacks)

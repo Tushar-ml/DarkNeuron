@@ -67,7 +67,7 @@ class Classify_Images(Dark_Neuron):
     Defining Preprocess Function to Preprocess the Images with Different Flow Method
     
     """
-    def Preprocess_the_Image(self,method,train,num_classes,batch_size=32,target_image_size=(224,224,3),model_name = None,user_model = None,image_path=None,grayscale=None,training_image_directory=None,validation_image_directory=None,dataframe=None,
+    def Preprocess_the_Image(self,method,train,num_classes=2,batch_size=32,target_image_size=(224,224,3),model_name = None,user_model = None,image_path=None,grayscale=None,training_image_directory=None,validation_image_directory=None,dataframe=None,
                             test_image_directory=None,x_train=None,x_test=None,y_train=None,y_test=None,x_col=None,y_col = None,split=0.1,image_directory=None,input_tensor=None):
         """
         This function Will do image processing and return training Data Generator, Validation Data Generator
