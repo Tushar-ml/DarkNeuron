@@ -22,7 +22,7 @@ from .Prediction import Prediction
 import matplotlib.pyplot as plt
 
  
-class Classify_Images(Deep_Stack):
+class Classify_Images(Dark_Neuron):
     """
     This Class will have Following Properties:
         
@@ -36,7 +36,7 @@ class Classify_Images(Deep_Stack):
         --Train_the_Model
         --Predict_from_the_Model
         --Visualize_the_Metric
-        --Deploy_the_Model
+        
     """
     def __init__(self,working_directory,output_directory):
         """
@@ -55,7 +55,7 @@ class Classify_Images(Deep_Stack):
             None
         
         """
-        Deep_Stack.__init__(self,working_directory,output_directory)
+        Dark_Neuron.__init__(self,working_directory,output_directory)
         self.working_directory = working_directory
         self.output_directory = output_directory
         
