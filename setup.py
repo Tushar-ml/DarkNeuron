@@ -15,7 +15,7 @@ setup(
           'keras == 2.1.4', 'pandas==0.23.0','PyAutoGUI==0.9.48','opencv-python==4.2.0.32','Pillow==5.3.0'
       ],
   classifiers=[
-    'Development Status :: 5',
+    'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',      # Define that your audience are developers
     'Topic :: Software Development :: Build Tools',
     'License :: OSI Approved :: MIT License',   # Again, pick a license
