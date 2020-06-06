@@ -13,8 +13,8 @@ from keras import backend as K
 from keras.models import load_model
 from PIL import Image, ImageFont, ImageDraw
 
-from .yolo4.model import yolo_eval
-from .yolo4.utils import letterbox_image
+from .yolo4_model import yolo_eval
+from .yolo4_utils import letterbox_image
 
 class YOLO_Tracker(object):
     def __init__(self,working_directory,model_name=None,score=0.6,classes = []):
