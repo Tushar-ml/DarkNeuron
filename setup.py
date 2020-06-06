@@ -8,7 +8,7 @@ setup(
   author = 'Tushar Goel',
   author_email = 'tgoel219@gmail.com',     
   url = 'https://github.com/Tushar-ml/DarkNeuron',   
-  download_url = 'https://github.com/Tushar-ml/DarkNeuron/archive/v1.1.tar.gz',    
+  download_url = 'https://github.com/Tushar-ml/DarkNeuron/archive/v1.2.tar.gz',    
   keywords = ['Keras','Object_Detection','CNN'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
           'wget','tensorflow == 1.15.0','numpy == 1.18.4','scipy == 1.4.1','matplotlib == 3.2.1',
