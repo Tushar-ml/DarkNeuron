@@ -285,7 +285,7 @@ def Train_Model(model,num_classes,train_data_object,working_directory,output_dir
             history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs=epochs,validation_data = validation_data_object,
                                 callbacks = my_callbacks)
     else:
-        New_Model.compile(loss = loss,optimizer = optimizer,metrics = [metrics])
+        New_Model.compile(loss = loss,optimizer = optimizer,metrics = metrics)
         if validation_data_object is None:
             
             history = New_Model.fit_generator(train_data_object,steps_per_epoch = steps_per_epoch,epochs= epochs)
