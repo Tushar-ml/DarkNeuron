@@ -55,7 +55,7 @@ datashape==0.5.4
 decorator==4.3.0
 deepspeech==0.7.1
 distributed==1.21.8
-Django==3.0.6
+Django==3.0.7
 djangorestframework==3.11.0
 dlib==19.7.0
 dnspython==1.16.0
