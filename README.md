@@ -58,7 +58,7 @@ Initialization of Classification Model of DarkNeuron requires **working_director
 as a main argument. It should have models and Raw_Data in it.
 It can be Initialized as below:
 
-    from DarkNeuron import Classify_Images
+    from DarkNeurons import Classify_Images
     classify = Classify_Images(working_directory = "Working Directory")
    
 <h3 id='class_prepare'>Preparation of Data</h3>
