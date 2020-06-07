@@ -89,7 +89,7 @@ def Train_Yolo(working_directory,model_name = 'yolov4.h5',input_shape = (608,608
             steps_per_epoch=max(1, num_train//batch_size),
             validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
             validation_steps=max(1, num_val//batch_size),
-            epochs=epochs2,
+            epochs=epochs2+epochs1,
             initial_epoch=epochs1,
             callbacks=[logging, checkpoint, reduce_lr, early_stopping])
         model.save(log_dir + 'trained_weights_final.h5')

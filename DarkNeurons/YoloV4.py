@@ -136,13 +136,16 @@ class YOLOv4:
         
         
         self.history = history
-        print('\n\t\t----------Visualisation of Metrics-------------')
         
-        plt.plot(self.history.history['loss'],label = 'Training Loss')
-        plt.plot(self.history.history['val_loss'],label = 'Validation Loss')
-        plt.title('Training Loss vs Validation Loss')
-        plt.legends()
-        plt.show()
+        try:
+            plt.plot(self.history.history['loss'],label = 'Training Loss')
+            plt.plot(self.history.history['val_loss'],label = 'Validation Loss')
+            plt.title('Training Loss vs Validation Loss')
+            plt.legends()
+            plt.show()
+        
+        except:
+            pass
         
     def Detect(self,test_folder_name='test',model_name = None,cam = False,real_time = False,videopath = 0,classes = [],tracking =False,score=0.5,gpu_num = 1):
         
