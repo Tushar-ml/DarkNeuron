@@ -73,7 +73,7 @@ Preparation of Data for Classification takes place in terms of whether the user 
 <h4><u> Method: Directory</u></h4>
 <b> Code Syntax:</b> (Continue from above....)
 
-    train,val,labels = classify.Prepare_the_Data(method = 'directory', train =True,
+    train,val,labels = classify.Preprocess_the_Image(method = 'directory', train =True,
 				num_classes = 2, batch_size = 32, #Default
 				target_image_size = (224,224,3) #Default
 				model_name = 'InceptionV3',
@@ -97,7 +97,7 @@ Let's See each argument and their default values:
 <h4><u>Method: DataFrame</u></h4>
 <b>Code Syntax:</b>
 
-    train,val,labels = classify.Prepare_the_Data(method = 'dataframe', train = True,
+    train,val,labels = classify.Preprocess_the_Image(method = 'dataframe', train = True,
 				num_classes = 2,batch_size = 32,
 				dataframe = df ,
 				x_col_name = 'filename',
@@ -117,7 +117,7 @@ Let's Understand the above arguments:
  <b>Code Example....</b>
  
 
-    train,val,labels = classify.Prepare_the_Data(method = 'point',train = True,
+    train,val,labels = classify.Preprocess_the_Image(method = 'point',train = True,
 				x_train = x_train,y_train = y_train,
 				x_test = x_test,y_test = y_test)
 
@@ -131,7 +131,7 @@ Let's Understand each argument:
 <h4><u>Method: Image</u></h4>
 <b>Code Syntax:</b>
 
-    test = classify.Prepare_the_Data(method='image',train = False,
+    test = classify.Preprocess_the_Image(method='image',train = False,
 				image_path = 'Path of the Image',
 				grayscale=False
 				)
