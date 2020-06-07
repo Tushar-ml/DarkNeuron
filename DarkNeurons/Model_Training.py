@@ -32,7 +32,7 @@ def Train_Yolo(working_directory,model_name = 'yolov4.h5',input_shape = (608,608
     if not os.path.exists(log_dir):
         os.mkdir(log_dir)
     classes_path = os.path.join(working_directory,'data_classes.txt')
-    anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
+    anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
     class_names = get_classes(classes_path)
     num_classes = len(class_names)
     anchors = get_anchors(anchors_path)

@@ -36,12 +36,12 @@ def Detector(working_directory,test_folder_name,classes = [],model_name=None,sco
 
     if model_name is None:
         model_weights = os.path.join(working_directory,'yolov4.h5')
-        model_classes = os.path.join(os.path.dirname(__file__),'model_data/coco_classes.txt')
+        model_classes = os.path.join(os.path.dirname(__file__),'coco_classes.txt')
     else:
         model_weights = os.path.join(working_directory,model_name)
         model_classes = os.path.join(working_directory,'data_classes.txt')
     
-    anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
+    anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
     detection_results_file = os.path.join(working_directory,'Detections_results.csv')
     postfix = 'Detection'
     save_img = True

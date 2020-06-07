@@ -7,10 +7,10 @@ import os
 
 def Web_Cam_Detection(working_directory,videopath=0,model_name=None,classes = [],score = 0.6,iou = 0.5,gpu_num = 1):
     
-    anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
+    anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
     if model_name is None:
         model_path = os.path.join(working_directory,'yolov4.h5')
-        classes_path = os.path.join(os.path.dirname(__file__),'model_data/coco_classes.txt')
+        classes_path = os.path.join(os.path.dirname(__file__),'coco_classes.txt')
     else:
         model_path = os.path.join(working_directory,model_name)
         classes_path = os.path.join(working_directory,'data_classes.txt')

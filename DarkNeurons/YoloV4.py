@@ -8,6 +8,7 @@ Author: Tushar Goel
 
 """
 import os
+import wget
 from .realtime_detect import Real_Time_Tracking
 from .Yolo_Format import Image_Annotation
 from .Download_Convert_Yolo_Weights import Yolo4_weights,Download_weights
@@ -43,6 +44,23 @@ class YOLOv4:
         print('\t\t###########################\n')
         print('\t\tWelcome To The DARK NEURON\n')
         print('\t\t###########################\n')
+              
+        coco_classes_path = os.path.join(os.path.dirname(__file__),'coco_classes.txt')
+        anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
+        font_path = os.path.join(os.path.dirname(__file__),'FiraMono-Medium.otf')
+        tracking_file_path = os.path.join(os.path.dirname(__file__),'mars-small128.pb')
+        
+        if not os.path.exists(coco_classes_path):
+            wget.download('https://github.com/Tushar-ml/DarkNeuron/releases/download/v1.3.1/coco_classes.txt',coco_classes_path)
+        
+        if not os.path.exists(anchors_path):
+            wget.download('https://github.com/Tushar-ml/DarkNeuron/releases/download/v1.3.1/yolo4_anchors.txt',anchors_path)
+            
+        if not os.path.exists(font_path):
+            wget.download('https://github.com/Tushar-ml/DarkNeuron/releases/download/v1.3.1/FiraMono-Medium.otf',font_path)
+            
+        if not os.path.exists(tracking_file_path):
+            wget.download('https://github.com/Tushar-ml/DarkNeuron/releases/download/v1.3.1/mars-small128.pb',tracking_file_path)
     
     def Prepare_the_Data(self,file_type,dataframe_name=None,class_file_name=None):
         """
@@ -98,9 +116,9 @@ class YOLOv4:
         
         yolo_file_path = os.path.join(self.working_directory,'yolov4.h5')
         self.class_path = os.path.join(self.working_directory,'class_list.txt')
-        self.anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
+        self.anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
         self.weight_path = os.path.join(self.working_directory,'yolov4.weights')
-        self.coco_class = os.path.join(os.path.dirname(__file__),'model_data/coco_classes.txt')
+        self.coco_class = os.path.join(os.path.dirname(__file__),'coco_classes.txt')
         #Checking whether User have Yolo File or Not 
         #If no File, then it will be downloaded Automatically and Converted to Keras Model
         if not os.path.exists(yolo_file_path):

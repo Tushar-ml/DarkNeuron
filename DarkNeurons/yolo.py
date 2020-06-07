@@ -20,8 +20,8 @@ from keras.utils import multi_gpu_model
 class YOLO:
     _defaults = {
         "model_path": 'model_data/yolo4.h5',
-        "anchors_path": os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt'),
-        "classes_path": os.path.join(os.path.dirname(__file__),'model_data/coco_classes.txt'),
+        "anchors_path": os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt'),
+        "classes_path": os.path.join(os.path.dirname(__file__),'coco_classes.txt'),
         "score" : 0.5,
         "iou" : 0.45,
         "model_image_size" : (608, 608),
@@ -162,7 +162,7 @@ class YOLO:
             print("Found {} boxes for {}".format(len(out_boxes), "img"))
         out_prediction = []
 
-        font_path = os.path.join(os.path.dirname(__file__), "font/FiraMono-Medium.otf")
+        font_path = os.path.join(os.path.dirname(__file__), "FiraMono-Medium.otf")
         font = ImageFont.truetype(
             font=font_path, size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32")
         )

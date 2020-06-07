@@ -24,7 +24,7 @@ def DeepSort_Tracking(yolo,working_directory,file_path = 0):
     nms_max_overlap = 1.0
     
     # Deep SORT
-    model_filename = os.path.join(os.path.dirname(__file__),'model_data/mars-small128.pb')
+    model_filename = os.path.join(os.path.dirname(__file__),'mars-small128.pb')
     print('Deep Sort Model Generated')
     encoder = create_box_encoder(model_filename,batch_size=1)
     

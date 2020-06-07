@@ -9,10 +9,10 @@ width,height = pyautogui.size()[0],pyautogui.size()[1]
 
 def Real_Time_Tracking(working_directory,classes = [],model_name=None,score = 0.6,iou = 0.5,gpu_num = 1):
     
-    anchors_path = os.path.join(os.path.dirname(__file__),'model_data/yolo4_anchors.txt')
+    anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
     if model_name is None:
         model_path = os.path.join(working_directory,'yolov4.h5')
-        classes_path = os.path.join(os.path.dirname(__file__),'model_data/coco_classes.txt')
+        classes_path = os.path.join(os.path.dirname(__file__),'coco_classes.txt')
     else:
         model_path = os.path.join(working_directory,model_name)
         classes_path = os.path.join(working_directory,'data_classes.txt')
