@@ -297,10 +297,9 @@ There are two process involved :
 This Function will be used to detect objects from video and Images.
 This Function has following features:<br>
 
- - **Real Time Detection** --> Play a Video on your laptop or Take real data from CCTV , and run the model , it will take your screen as an input and Detect objects in it.
  - **Web Cam Detection** --> It will Detect using webcams and can also be used by Mobile Phone Cameras ( see IPWebCam )
  - **Choose Class** --> You can choose your own prediction classes , means which object to predict which to not. For Example, on COCO dataset , it has 80 labels, then you should pass person to the function, it will detect only person, leave everthing else as it is.
- - **Tracking**: Multi Object Tracking with DeepSORT (Deep Simple Online Real Tracking)
+ 
  
  <b> Code Synatax:</b>
  
@@ -308,7 +307,6 @@ This Function has following features:<br>
     yolo.Detect(test_folder_name = 'test',
 		    model_name = None,
 		    cam = False,
-		    real_time = False,
 		    videopath = 0,
 		    classes = [],
 		    score = 0.5,
@@ -318,7 +316,6 @@ This Function has following features:<br>
  - **test_folder_name**: Test folder name in working directory ( images and video both, it will detect automatically and take actions according to it)
  - **model_name**: Model name saved in working_directory by Training, otherwise it will take yolov4.h5 by default.
  - **cam**: To enable Web Cam Detection
- - **real_time**: To enable Real Time Detection
  - **videopath**: Path to the video to detect
  - **classes**: Selelctive choosing of Classes for Detections (**Provide as List**)
  - **score**:  Threshold of Score for Prediction
