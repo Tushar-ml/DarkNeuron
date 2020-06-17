@@ -25,7 +25,8 @@ class Image_Annotation:
     
     Attributes:
         working_directory --> working_directory where files and Labels will be there.
-        Dataframe Name --> DataFrame Name containing Label Files and Images
+        output_directiry --> Output Directory, where function generated files will be kept.
+        File_path --> DataFrame Name containing Label Files and Images
         
     Methods:
         Convert_to_Yolo_Format
@@ -39,9 +40,10 @@ class Image_Annotation:
         
     """
     
-    def __init__(self,working_directory,dataframe_name=None):
+    def __init__(self,working_directory,output_directory,file_path):
         
         self.working_directory = working_directory
+        self.output_directory = output_directory
         
         #Initialing Variables Required in Image Annotation
         """
@@ -49,13 +51,13 @@ class Image_Annotation:
         self.data_classes --> Containing Classes of the data
         
         """
-        if dataframe_name is not None:
-            self.dataframe_path = os.path.join(self.working_directory,dataframe_name)
-        self.data_train = os.path.join(self.working_directory,'data_train.txt')
-        self.data_classes = os.path.join(self.working_directory,'data_classes.txt')
+        
+        self.dataframe_path = os.path.join(self.working_directory,file_path)
+        self.data_train = os.path.join(self.output_directory,'data_train.txt')
+        self.data_classes = os.path.join(self.output_directory,'data_classes.txt')
         
     
-    def Convert_to_Yolo_Format(self,df=None):
+    def Convert_to_Yolo_Format(self,file_path = None,df=None):
         
         if df is not None:
             multi_df = df
@@ -123,8 +125,8 @@ class Image_Annotation:
         file.close()
         return True
     
-    def csv_from_xml(self,class_list_file_name):
-        output_path = self.working_directory
+    def csv_from_xml(self,file_path,class_list_file_name):
+        output_path = os.path.join(self.working_directory,file_path)
         class_file_text = os.path.join(self.working_directory,class_list_file_name)
         class_file = open(class_file_text,'r')
         classes = class_file.readlines()
@@ -142,10 +144,11 @@ class Image_Annotation:
             convert_annotation(output_path, output_path, image_path,class_list)
         list_file.close()
         
-    def csv_from_text(self,class_list_file_name):
+    def csv_from_text(self,file_path,class_list_file_name):
         
-        text_file_paths = glob(os.path.join(self.working_directory,'*.txt'))
-        image_file_paths = GetFileList(self.working_directory,['.jpg','.jpeg','.png'])
+        directory = os.path.join(self.working_directory,file_path)
+        text_file_paths = glob(os.path.join(directory,'*.txt'))
+        image_file_paths = GetFileList(directory,['.jpg','.jpeg','.png'])
         #Removing Class_text file from text path:
         
         class_file_text = os.path.join(self.working_directory,class_list_file_name)
@@ -154,15 +157,19 @@ class Image_Annotation:
    
         class_file = open(class_file_text,'r')
         classes = class_file.readlines()
+        
         class_dic = dict()
         count = 0
         class_list = []
         for cla in classes:
-            cla = cla.split()[0]
+            
             class_list.append(cla)
             
         class_list = sorted(class_list)
+        
         for cla in class_list:
+            if cla == '\n':
+                continue
             cla = cla.split()[0]
             class_dic[count] = cla
             count += 1

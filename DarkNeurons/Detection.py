@@ -19,7 +19,7 @@ from .Yolo_Format import GetFileList
 import random
 
 
-def Detector(working_directory,test_folder_name,classes = [],model_name=None,score=0.5,gpu_num = 1):
+def Detector(working_directory,output_directory,test_folder_name,classes = [],model_name=None,score=0.5,gpu_num = 1):
     """
     This Function will be used for Detection of Objects in Video Or Images
     
@@ -34,15 +34,15 @@ def Detector(working_directory,test_folder_name,classes = [],model_name=None,sco
     """
     image_test_folder = os.path.join(working_directory,test_folder_name)
 
-    if model_name is None:
-        model_weights = os.path.join(working_directory,'yolov4.h5')
+    if model_name == 'yolov4.h5':
+        model_weights = os.path.join(output_directory,'yolov4.h5')
         model_classes = os.path.join(os.path.dirname(__file__),'coco_classes.txt')
     else:
-        model_weights = os.path.join(working_directory,model_name)
+        model_weights = os.path.join(output_directory,model_name)
         model_classes = os.path.join(working_directory,'data_classes.txt')
     
     anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
-    detection_results_file = os.path.join(working_directory,'Detections_results.csv')
+    detection_results_file = os.path.join(output_directory,'Detections_results.csv')
     postfix = 'Detection'
     save_img = True
     

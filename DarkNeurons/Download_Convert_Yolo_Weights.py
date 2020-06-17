@@ -25,7 +25,7 @@ from operator import itemgetter
 
 class Yolo4_weights(object):
     
-    def __init__(self, score, iou, anchors_path, classes_path, model_path, weights_path, gpu_num=1):
+    def __init__(self, score, anchors_path, classes_path, model_path, weights_path, gpu_num=1,iou=0.5):
         self.score = score
         self.iou = iou
         self.anchors_path = anchors_path
@@ -182,13 +182,13 @@ def bar_progress(current, total, width=80):
   sys.stdout.write("\r" + progress_message)
   sys.stdout.flush()
 
-def Download_weights(working_directory):
+def Download_weights(output_directory):
         """
         This Function will be used to download yolov3 weights from Darknet.
         
         """
     
-        weights_path = os.path.join(working_directory,"yolov4.weights")
+        weights_path = os.path.join(output_directory,"yolov4.weights")
         
         if not os.path.exists(weights_path):
             

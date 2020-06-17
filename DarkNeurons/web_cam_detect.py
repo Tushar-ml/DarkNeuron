@@ -5,14 +5,14 @@ from .yolo import YOLO
 import os 
 
 
-def Web_Cam_Detection(working_directory,videopath=0,model_name=None,classes = [],score = 0.6,iou = 0.5,gpu_num = 1):
+def Web_Cam_Detection(working_directory,output_directory,videopath=0,model_name=None,classes = [],score = 0.6,iou = 0.5,gpu_num = 1):
     
     anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
-    if model_name is None:
-        model_path = os.path.join(working_directory,'yolov4.h5')
+    if model_name == 'yolov4.h5':
+        model_path = os.path.join(output_directory,'yolov4.h5')
         classes_path = os.path.join(os.path.dirname(__file__),'coco_classes.txt')
     else:
-        model_path = os.path.join(working_directory,model_name)
+        model_path = os.path.join(output_directory,model_name)
         classes_path = os.path.join(working_directory,'data_classes.txt')
     
     yolo = YOLO(
@@ -26,7 +26,7 @@ def Web_Cam_Detection(working_directory,videopath=0,model_name=None,classes = []
         }
         )
     cap = cv2.VideoCapture(videopath)
-    out = cv2.VideoWriter(os.path.join(working_directory,'output_web.avi'),cv2.VideoWriter_fourcc(*"MJPG"), 5, (int(cap.get(3)), int(cap.get(4))))    
+    out = cv2.VideoWriter(os.path.join(output_directory,'output_web.avi'),cv2.VideoWriter_fourcc(*"MJPG"), 5, (int(cap.get(3)), int(cap.get(4))))    
     
     while True:
         ret,frame = cap.read()

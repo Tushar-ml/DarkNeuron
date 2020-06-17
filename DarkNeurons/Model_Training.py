@@ -25,13 +25,13 @@ from .yolo4_model import preprocess_true_boxes, yolo4_body, yolo4_loss
 from .yolo4_utils import get_random_data
 
 
-def Train_Yolo(working_directory,model_name = 'yolov4.h5',input_shape = (608,608),val_split = 0.1,batch_size1 = 32,batch_size2 = 4,epochs1 = 51,epochs2 = 30,
+def Train_Yolo(working_directory,output_directory,model_name = 'yolov4.h5',input_shape = (608,608),val_split = 0.1,batch_size1 = 32,batch_size2 = 4,epochs1 = 51,epochs2 = 30,
                process1 = True,process2 = True):
-    annotation_path = os.path.join(working_directory,'data_train.txt')
-    log_dir = os.path.join(working_directory,'logs')
+    annotation_path = os.path.join(output_directory,'data_train.txt')
+    log_dir = os.path.join(output_directory,'logs')
     if not os.path.exists(log_dir):
         os.mkdir(log_dir)
-    classes_path = os.path.join(working_directory,'data_classes.txt')
+    classes_path = os.path.join(output_directory,'data_classes.txt')
     anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
     class_names = get_classes(classes_path)
     num_classes = len(class_names)

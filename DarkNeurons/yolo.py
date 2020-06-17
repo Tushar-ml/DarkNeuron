@@ -19,7 +19,7 @@ from keras.utils import multi_gpu_model
 
 class YOLO:
     _defaults = {
-        "model_path": 'model_data/yolo4.h5',
+        "model_path": 'model_data/yolov4.h5',
         "anchors_path": os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt'),
         "classes_path": os.path.join(os.path.dirname(__file__),'coco_classes.txt'),
         "score" : 0.5,
@@ -67,7 +67,7 @@ class YOLO:
         num_classes = len(self.class_names)
         is_tiny_version = num_anchors == 6  # default setting
         try:
-            self.yolo_model = load_model(model_path, compile=False)
+            self.yolo_model = load_model(model_path, compile=True)
         except:
             self.yolo_model = (
                 tiny_yolo_body(

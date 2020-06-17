@@ -239,7 +239,7 @@ If you have predefined yolov4 weights : Named it as --> 'yolov4.weights'
 If you have predefined yolov4 model: Named it as --> 'yolov4.h5'
 
     from DarkNeuron import YOLOv4
-    yolo = YOLOv4( working_directory )
+    yolo = YOLOv4( working_directory , output_directory)
 
 <h3 id='obj_prepare'> Preparation of Data</h3>
 
@@ -253,12 +253,13 @@ This Function take file in three formats and converted them into YOLO Format Aut
  <b>Code Syntax:</b>
  
 
-    yolo.Prepare_the_Data(file_type,
+    yolo.Prepare_the_Data(file_type,file_path,
 			    dataframe_name = None,
 			    class_file_name = None
 			    )
 
  - **file_type**: This contain file_type: whether csv, xml, or text_files
+ - **file_path**: This contain the path to data directory
  - **dataframe_name**: This should be given as name of csv file in working_directory
  - **class_file_name**: provide name of the  class list as text file in working directory
 
