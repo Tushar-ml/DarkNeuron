@@ -127,7 +127,7 @@ class Image_Annotation:
     
     def csv_from_xml(self,file_path,class_list_file_name):
         output_path = os.path.join(self.working_directory,file_path)
-        class_file_text = os.path.join(self.working_directory,class_list_file_name)
+        class_file_text = class_list_file_name
         class_file = open(class_file_text,'r')
         classes = class_file.readlines()
 
@@ -138,7 +138,6 @@ class Image_Annotation:
             
         class_list = sorted(class_list)
         image_paths = getImagesInDir(output_path)
-        
         for image_path in image_paths:
             
             convert_annotation(output_path, output_path, image_path,class_list)
