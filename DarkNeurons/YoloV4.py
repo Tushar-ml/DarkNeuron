@@ -95,7 +95,7 @@ class YOLOv4:
         elif self.file_type == 'xml':
             print("Generating Data......")
             print('Generating txt files from xml')
-            class_file_name = os.path.join(working_directory,class_file_name)
+            class_file_name = os.path.join(self.working_directory,class_file_name)
             Image_Annot.csv_from_xml(file_path = file_path,class_list_file_name = class_file_name)
             print('Generated')
             df = Image_Annot.csv_from_text(file_path = file_path,class_list_file_name = class_file_name)
