@@ -52,9 +52,9 @@ def convert_annotation(dir_path, output_path, image_path,classes):
     basename_no_ext = os.path.splitext(basename)[0]
     img = cv2.imread(image_path)
     
-    in_file = open(dir_path + '\\' + basename_no_ext + '.xml')
+    in_file = open(dir_path + '/' + basename_no_ext + '.xml')
     
-    out_file = open(output_path +'\\'+ basename_no_ext + '.txt', 'w')
+    out_file = open(output_path +'/'+ basename_no_ext + '.txt', 'w')
     tree = ET.parse(in_file)
     root = tree.getroot()
     size = root.find('size')
