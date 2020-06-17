@@ -138,11 +138,11 @@ class Image_Annotation:
             
         class_list = sorted(class_list)
         image_paths = getImagesInDir(output_path)
-        list_file = open(output_path + '.txt', 'w')
+        
         for image_path in image_paths:
-            list_file.write(image_path + '\n')
+            
             convert_annotation(output_path, output_path, image_path,class_list)
-        list_file.close()
+        
         
     def csv_from_text(self,file_path,class_list_file_name):
         
