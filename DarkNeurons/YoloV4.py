@@ -9,7 +9,6 @@ Author: Tushar Goel
 """
 import os
 import wget
-from .realtime_detect import Real_Time_Tracking
 from .Yolo_Format import Image_Annotation
 from .Download_Convert_Yolo_Weights import Yolo4_weights,Download_weights
 from .Model_Training import Train_Yolo
@@ -170,10 +169,6 @@ class YOLOv4:
 
             Web_Cam_Detection(working_directory = self.working_directory,videopath = videopath,model_name=model_name,score=score,
                               gpu_num = gpu_num,classes = classes)
-            
-        elif tracking :
-                
-            DeepSort_Tracking(working_directory = self.working_directory,yolo = yolo_tracker,file_path = videopath)
         
         else:
             Detector(working_directory = self.working_directory,test_folder_name = test_folder_name,
