@@ -114,6 +114,7 @@ def Detector(working_directory,output_directory,test_folder_name,classes = [],mo
                 save_img=save_img,
                 save_img_path=output_path,
                 postfix=postfix,
+                class_path = model_classes,
             )
             y_size, x_size, _ = np.array(image).shape
             for single_prediction in prediction:

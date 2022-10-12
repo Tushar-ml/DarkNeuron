@@ -130,8 +130,9 @@ class YOLO:
         )
         return boxes, scores, classes
 
-    def detect_image(self, image,classes = [],score = 0.5,show_stats=True):
+    def detect_image(self, image, class_path = os.path.join(os.path.dirname(__file__),'coco_classes.txt'), classes = [],score = 0.5,show_stats=True):
         start = timer()
+        self.classes_path = class_path
         # self.sess.run(tf.compat.v1.global_variables_initializer())
         if self.model_image_size != (None, None):
             assert self.model_image_size[0] % 32 == 0, "Multiples of 32 required"
