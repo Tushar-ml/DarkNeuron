@@ -145,11 +145,12 @@ class Image_Annotation:
         
     def csv_from_text(self,file_path,class_list_file_name):
         
-        directory = os.path.join(self.working_directory,file_path)
+        directory = self.working_directory
         text_file_paths = glob(os.path.join(directory,'*.txt'))
-        image_file_paths = GetFileList(directory,['.jpg','.jpeg','.png','.bmp'])
+        image_file_paths = GetFileList(directory,['.jpg','.jpeg','.png','.BMP'])
+
         #Removing Class_text file from text path:
-        
+        print(image_file_paths, text_file_paths)
         class_file_text = os.path.join(self.working_directory,class_list_file_name)
         text_file_paths.remove(class_file_text) #This is not our Data 
         assert len(text_file_paths) == len(image_file_paths),"Length of image files and Their corressponding text files does not match"
@@ -217,10 +218,12 @@ class Image_Annotation:
         
     
     
-def GetFileList(dirName, endings=[".jpg", ".jpeg", ".png",'.bmp', ".mp4"]):
+def GetFileList(dirName, endings=[".jpg", ".jpeg", ".png",'.BMP', ".mp4"]):
         # create a list of file and sub directories
         # names in the given directory
-        listOfFile = os.listdir(dirName)
+        
+        listOfFile = glob(f'{dirName}/*.*')
+        print(listOfFile)
         allFiles = list()
         # Make sure all file endings start with a '.'
         endings_final = [0]*len(endings)
@@ -232,11 +235,8 @@ def GetFileList(dirName, endings=[".jpg", ".jpeg", ".png",'.bmp', ".mp4"]):
             # Create full path
             fullPath = os.path.join(dirName, entry)
             # If entry is a directory then get the list of files in this directory
-            if os.path.isdir(fullPath):
-                allFiles = allFiles + GetFileList(fullPath, endings)
-            else:
-                for ending in endings:
-                    if entry.endswith(ending):
-                        allFiles.append(fullPath)
+            
+            for ending in endings:
+                if entry.endswith(ending):
+                    allFiles.append(fullPath)
         return allFiles
-

@@ -47,7 +47,7 @@ def Detector(working_directory,output_directory,test_folder_name,classes = [],mo
     save_img = True
     
     input_paths = GetFileList(dirName = image_test_folder)
-    img_endings = (".jpg", ".jpeg", ".png",".bmp")
+    img_endings = (".jpg", ".jpeg", ".png",".BMP")
     vid_endings = (".mp4", ".mpeg", ".mpg", ".avi",".mkv")
 
     input_image_paths = []
