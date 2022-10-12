@@ -120,15 +120,17 @@ class YOLOv4:
         self.class_path = os.path.join(self.working_directory,class_file_name)
         self.anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
         self.weight_path = os.path.join(self.working_directory,'yolov4.weights')
+        self.yoloh5_path = os.path.join(self.working_directory,'yolov4.h5')
         self.coco_class = os.path.join(os.path.dirname(__file__),'coco_classes.txt')
         #Checking whether User have Yolo File or Not 
         #If no File, then it will be downloaded Automatically and Converted to Keras Model
         if not os.path.exists(self.weight_path):
             Download_weights(output_directory = self.output_directory)
-
-        yolov4 = Yolo4_weights(score=score,iou=iou,anchors_path = self.anchors_path,classes_path = self.coco_classes_path,
-                                model_path = yolo_file_path,weights_path = self.weight_path,gpu_num = gpu_num)
-        yolov4.load_yolo()
+        
+        elif not os.path.exists(self.yoloh5_path):
+            yolov4 = Yolo4_weights(score=score,iou=iou,anchors_path = self.anchors_path,classes_path = self.coco_classes_path,
+                                    model_path = yolo_file_path,weights_path = self.weight_path,gpu_num = gpu_num)
+            yolov4.load_yolo()
 
         
         print('Model Training to be Start ....')
