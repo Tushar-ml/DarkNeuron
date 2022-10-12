@@ -111,9 +111,10 @@ def Detector(working_directory,output_directory,test_folder_name,classes = [],mo
             prediction, image = detect_object(
                 yolo,
                 img_path,
+                model_classes,
                 save_img=save_img,
                 save_img_path=output_path,
-                postfix=postfix,
+                postfix=postfix
             )
             y_size, x_size, _ = np.array(image).shape
             for single_prediction in prediction:

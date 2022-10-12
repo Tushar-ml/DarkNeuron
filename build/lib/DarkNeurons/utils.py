@@ -14,7 +14,7 @@ from timeit import default_timer as timer
 min_logo_size = (10, 10)
 
 
-def detect_object(yolo, img_path, save_img,classes = [],score = 0.5, save_img_path="./", postfix="", class_path = os.path.join(os.path.dirname(__file__),'coco_classes.txt')):
+def detect_object(yolo, img_path, class_path, save_img,classes = [],score = 0.5, save_img_path="./", postfix=""):
     """
     Call YOLO logo detector on input image, optionally save resulting image.
 

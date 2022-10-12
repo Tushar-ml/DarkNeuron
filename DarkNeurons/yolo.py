@@ -38,13 +38,13 @@ class YOLO:
     def __init__(self, **kwargs):
         self.__dict__.update(self._defaults) # set up default values
         self.__dict__.update(kwargs) # and update with user overrides
-        self.class_names = self._get_class()
+        self.class_names = self._get_class(self.classes_path)
         self.anchors = self._get_anchors()
         self.sess = K.get_session()
         self.boxes, self.scores, self.classes = self.generate()
 
-    def _get_class(self):
-        classes_path = os.path.expanduser(self.classes_path)
+    def _get_class(self, classes_path):
+        classes_path = os.path.expanduser(classes_path)
         with open(classes_path) as f:
             class_names = f.readlines()
         class_names = [c.strip() for c in class_names]
@@ -130,9 +130,9 @@ class YOLO:
         )
         return boxes, scores, classes
 
-    def detect_image(self, image, class_path = os.path.join(os.path.dirname(__file__),'coco_classes.txt'), classes = [],score = 0.5,show_stats=True):
+    def detect_image(self, image, class_path, classes = [],score = 0.5,show_stats=True):
         start = timer()
-        self.classes_path = class_path
+        self.class_names = self._get_class(class_path)
         # self.sess.run(tf.compat.v1.global_variables_initializer())
         if self.model_image_size != (None, None):
             assert self.model_image_size[0] % 32 == 0, "Multiples of 32 required"
