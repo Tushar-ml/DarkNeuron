@@ -109,7 +109,7 @@ class YOLOv4:
             df = Image_Annot.csv_from_text(file_path=file_path,class_list_file_name = class_file_name)
             Image_Annot.Convert_to_Yolo_Format(df=df)
             
-    def Train_the_Yolo(self,model_name = 'yolov4.h5',input_shape = (608,608),plot_model=False,save_weights=False,score = 0.5,iou = 0.5,
+    def Train_the_Yolo(self,model_name = 'yolov4.h5',input_shape = (608,608),class_file_name = 'data_classes.txt',plot_model=False,save_weights=False,score = 0.5,iou = 0.5,
                        epochs1 = 51,epochs2 = 50, batch_size1 = 32,batch_size2 = 4,gpu_num = 1,
                        validation_split = 0.1,process1 = True,process2 = True):
         
@@ -117,18 +117,18 @@ class YOLOv4:
         print('\n\t\t------------Training Phase Generated---------')
         
         yolo_file_path = os.path.join(self.working_directory,model_name)
-        self.class_path = os.path.join(self.output_directory,'data_classes.txt')
+        self.class_path = os.path.join(self.working_directory,class_file_name)
         self.anchors_path = os.path.join(os.path.dirname(__file__),'yolo4_anchors.txt')
         self.weight_path = os.path.join(self.working_directory,'yolov4.weights')
         self.coco_class = os.path.join(os.path.dirname(__file__),'coco_classes.txt')
         #Checking whether User have Yolo File or Not 
         #If no File, then it will be downloaded Automatically and Converted to Keras Model
         if not os.path.exists(self.weight_path):
-            
             Download_weights(output_directory = self.output_directory)
-            yolov4 = Yolo4_weights(score=score,iou=iou,anchors_path = self.anchors_path,classes_path = self.coco_classes_path,
-                                   model_path = yolo_file_path,weights_path = self.weight_path,gpu_num = gpu_num)
-            yolov4.load_yolo()
+
+        yolov4 = Yolo4_weights(score=score,iou=iou,anchors_path = self.anchors_path,classes_path = self.coco_classes_path,
+                                model_path = yolo_file_path,weights_path = self.weight_path,gpu_num = gpu_num)
+        yolov4.load_yolo()
 
         
         print('Model Training to be Start ....')
