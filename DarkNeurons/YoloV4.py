@@ -129,7 +129,7 @@ class YOLOv4:
         
         
         yolov4 = Yolo4_weights(score=score,iou=iou,anchors_path = self.anchors_path,classes_path = self.coco_classes_path,
-                                model_path = self.weight_path,weights_path = self.weight_path,gpu_num = gpu_num)
+                                model_path = self.yoloh5_path,weights_path = self.weight_path,gpu_num = gpu_num)
         yolov4.load_yolo()
 
         
