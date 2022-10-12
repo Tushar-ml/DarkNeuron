@@ -147,7 +147,7 @@ class Image_Annotation:
         
         directory = os.path.join(self.working_directory,file_path)
         text_file_paths = glob(os.path.join(directory,'*.txt'))
-        image_file_paths = GetFileList(directory,['.jpg','.jpeg','.png'])
+        image_file_paths = GetFileList(directory,['.jpg','.jpeg','.png','.bmp'])
         #Removing Class_text file from text path:
         
         class_file_text = os.path.join(self.working_directory,class_list_file_name)
@@ -217,7 +217,7 @@ class Image_Annotation:
         
     
     
-def GetFileList(dirName, endings=[".jpg", ".jpeg", ".png", ".mp4"]):
+def GetFileList(dirName, endings=[".jpg", ".jpeg", ".png",'.bmp', ".mp4"]):
         # create a list of file and sub directories
         # names in the given directory
         listOfFile = os.listdir(dirName)
