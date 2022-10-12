@@ -37,6 +37,7 @@ def Train_Yolo(working_directory,output_directory,model_name = 'yolov4.h5',input
     num_classes = len(class_names)
     anchors = get_anchors(anchors_path)
     weights_path = os.path.join(working_directory,model_name)
+    print(weights_path)
     input_shape = input_shape # multiple of 32, hw
 
     model = create_model(input_shape, anchors, num_classes,
@@ -127,7 +128,7 @@ def create_model(input_shape, anchors, num_classes, load_pretrained=True, freeze
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors, num_classes))
 
     if load_pretrained:
-        model_body.load_weights(weights_path, by_name=True, skip_mismatch=True)
+        model_body.load_model(weights_path)
         print('Load weights {}.'.format(weights_path))
         if freeze_body in [1, 2]:
             # Freeze darknet53 body or freeze all but 3 output layers.
