@@ -73,94 +73,93 @@ class Yolo4_weights(object):
                 self.colors))
 
         self.sess = K.get_session()
+        
+        # Load model, or construct model and load weights.
+        self.yolo4_model = yolo4_body(Input(shape=(608, 608, 3)), num_anchors//3, num_classes)
 
-        if not os.path.exists(self.model_path):
-            # Load model, or construct model and load weights.
-            self.yolo4_model = yolo4_body(Input(shape=(608, 608, 3)), num_anchors//3, num_classes)
+        # Read and convert darknet weight
+        print('Loading weights.')
+        weights_file = open(self.weights_path, 'rb')
+        major, minor, revision = np.ndarray(
+            shape=(3, ), dtype='int32', buffer=weights_file.read(12))
+        if (major*10+minor)>=2 and major<1000 and minor<1000:
+            seen = np.ndarray(shape=(1,), dtype='int64', buffer=weights_file.read(8))
+        else:
+            seen = np.ndarray(shape=(1,), dtype='int32', buffer=weights_file.read(4))
+        print('Weights Header: ', major, minor, revision, seen)
 
-            # Read and convert darknet weight
-            print('Loading weights.')
-            weights_file = open(self.weights_path, 'rb')
-            major, minor, revision = np.ndarray(
-                shape=(3, ), dtype='int32', buffer=weights_file.read(12))
-            if (major*10+minor)>=2 and major<1000 and minor<1000:
-                seen = np.ndarray(shape=(1,), dtype='int64', buffer=weights_file.read(8))
+        convs_to_load = []
+        bns_to_load = []
+        for i in range(len(self.yolo4_model.layers)):
+            layer_name = self.yolo4_model.layers[i].name
+            if layer_name.startswith('conv2d_'):
+                convs_to_load.append((int(layer_name[7:]), i))
+            if layer_name.startswith('batch_normalization_'):
+                bns_to_load.append((int(layer_name[20:]), i))
+
+        convs_sorted = sorted(convs_to_load, key=itemgetter(0))
+        bns_sorted = sorted(bns_to_load, key=itemgetter(0))
+
+        bn_index = 0
+        for i in range(len(convs_sorted)):
+            print('Converting ', i)
+            if i == 93 or i == 101 or i == 109:
+                #no bn, with bias
+                weights_shape = self.yolo4_model.layers[convs_sorted[i][1]].get_weights()[0].shape
+                bias_shape = self.yolo4_model.layers[convs_sorted[i][1]].get_weights()[0].shape[3]
+                filters = bias_shape
+                size = weights_shape[0]
+                darknet_w_shape = (filters, weights_shape[2], size, size)
+                weights_size = np.product(weights_shape)
+
+                conv_bias = np.ndarray(
+                    shape=(filters, ),
+                    dtype='float32',
+                    buffer=weights_file.read(filters * 4))
+                conv_weights = np.ndarray(
+                    shape=darknet_w_shape,
+                    dtype='float32',
+                    buffer=weights_file.read(weights_size * 4))
+                conv_weights = np.transpose(conv_weights, [2, 3, 1, 0])
+                self.yolo4_model.layers[convs_sorted[i][1]].set_weights([conv_weights, conv_bias])
             else:
-                seen = np.ndarray(shape=(1,), dtype='int32', buffer=weights_file.read(4))
-            print('Weights Header: ', major, minor, revision, seen)
+                #with bn, no bias
+                weights_shape = self.yolo4_model.layers[convs_sorted[i][1]].get_weights()[0].shape
+                size = weights_shape[0]
+                bn_shape = self.yolo4_model.layers[bns_sorted[bn_index][1]].get_weights()[0].shape
+                filters = bn_shape[0]
+                darknet_w_shape = (filters, weights_shape[2], size, size)
+                weights_size = np.product(weights_shape)
 
-            convs_to_load = []
-            bns_to_load = []
-            for i in range(len(self.yolo4_model.layers)):
-                layer_name = self.yolo4_model.layers[i].name
-                if layer_name.startswith('conv2d_'):
-                    convs_to_load.append((int(layer_name[7:]), i))
-                if layer_name.startswith('batch_normalization_'):
-                    bns_to_load.append((int(layer_name[20:]), i))
+                conv_bias = np.ndarray(
+                    shape=(filters, ),
+                    dtype='float32',
+                    buffer=weights_file.read(filters * 4))
+                bn_weights = np.ndarray(
+                    shape=(3, filters),
+                    dtype='float32',
+                    buffer=weights_file.read(filters * 12))
 
-            convs_sorted = sorted(convs_to_load, key=itemgetter(0))
-            bns_sorted = sorted(bns_to_load, key=itemgetter(0))
+                bn_weight_list = [
+                    bn_weights[0],  # scale gamma
+                    conv_bias,  # shift beta
+                    bn_weights[1],  # running mean
+                    bn_weights[2]  # running var
+                ]
+                self.yolo4_model.layers[bns_sorted[bn_index][1]].set_weights(bn_weight_list)
 
-            bn_index = 0
-            for i in range(len(convs_sorted)):
-                print('Converting ', i)
-                if i == 93 or i == 101 or i == 109:
-                    #no bn, with bias
-                    weights_shape = self.yolo4_model.layers[convs_sorted[i][1]].get_weights()[0].shape
-                    bias_shape = self.yolo4_model.layers[convs_sorted[i][1]].get_weights()[0].shape[3]
-                    filters = bias_shape
-                    size = weights_shape[0]
-                    darknet_w_shape = (filters, weights_shape[2], size, size)
-                    weights_size = np.product(weights_shape)
+                conv_weights = np.ndarray(
+                    shape=darknet_w_shape,
+                    dtype='float32',
+                    buffer=weights_file.read(weights_size * 4))
+                conv_weights = np.transpose(conv_weights, [2, 3, 1, 0])
+                self.yolo4_model.layers[convs_sorted[i][1]].set_weights([conv_weights])
 
-                    conv_bias = np.ndarray(
-                        shape=(filters, ),
-                        dtype='float32',
-                        buffer=weights_file.read(filters * 4))
-                    conv_weights = np.ndarray(
-                        shape=darknet_w_shape,
-                        dtype='float32',
-                        buffer=weights_file.read(weights_size * 4))
-                    conv_weights = np.transpose(conv_weights, [2, 3, 1, 0])
-                    self.yolo4_model.layers[convs_sorted[i][1]].set_weights([conv_weights, conv_bias])
-                else:
-                    #with bn, no bias
-                    weights_shape = self.yolo4_model.layers[convs_sorted[i][1]].get_weights()[0].shape
-                    size = weights_shape[0]
-                    bn_shape = self.yolo4_model.layers[bns_sorted[bn_index][1]].get_weights()[0].shape
-                    filters = bn_shape[0]
-                    darknet_w_shape = (filters, weights_shape[2], size, size)
-                    weights_size = np.product(weights_shape)
+                bn_index += 1
 
-                    conv_bias = np.ndarray(
-                        shape=(filters, ),
-                        dtype='float32',
-                        buffer=weights_file.read(filters * 4))
-                    bn_weights = np.ndarray(
-                        shape=(3, filters),
-                        dtype='float32',
-                        buffer=weights_file.read(filters * 12))
+        weights_file.close()
 
-                    bn_weight_list = [
-                        bn_weights[0],  # scale gamma
-                        conv_bias,  # shift beta
-                        bn_weights[1],  # running mean
-                        bn_weights[2]  # running var
-                    ]
-                    self.yolo4_model.layers[bns_sorted[bn_index][1]].set_weights(bn_weight_list)
-
-                    conv_weights = np.ndarray(
-                        shape=darknet_w_shape,
-                        dtype='float32',
-                        buffer=weights_file.read(weights_size * 4))
-                    conv_weights = np.transpose(conv_weights, [2, 3, 1, 0])
-                    self.yolo4_model.layers[convs_sorted[i][1]].set_weights([conv_weights])
-
-                    bn_index += 1
-
-            weights_file.close()
-
-            self.yolo4_model.save(self.model_path)
+        self.yolo4_model.save(self.model_path)
 
 
         if self.gpu_num>=2:
