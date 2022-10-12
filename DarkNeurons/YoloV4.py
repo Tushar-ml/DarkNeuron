@@ -127,10 +127,10 @@ class YOLOv4:
         if not os.path.exists(self.weight_path):
             Download_weights(output_directory = self.output_directory)
         
-        elif not os.path.exists(self.yoloh5_path):
-            yolov4 = Yolo4_weights(score=score,iou=iou,anchors_path = self.anchors_path,classes_path = self.coco_classes_path,
-                                    model_path = yolo_file_path,weights_path = self.weight_path,gpu_num = gpu_num)
-            yolov4.load_yolo()
+        
+        yolov4 = Yolo4_weights(score=score,iou=iou,anchors_path = self.anchors_path,classes_path = self.coco_classes_path,
+                                model_path = self.weight_path,weights_path = self.weight_path,gpu_num = gpu_num)
+        yolov4.load_yolo()
 
         
         print('Model Training to be Start ....')
